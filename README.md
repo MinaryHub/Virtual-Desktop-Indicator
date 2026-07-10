@@ -10,7 +10,7 @@ Windows 가상 데스크톱의 **현재 위치를 화면에 반투명하게 상�
 
 ## 다운로드
 
-최신 설치 파일은 **[Releases 페이지](https://github.com/knoxxr/VirtualDesktopIndicator/releases/latest)** 에서 받으세요.
+최신 설치 파일은 **[Releases 페이지](https://github.com/knoxxr/Virtual-Desktop-Indicator/releases/latest)** 에서 받으세요.
 `VirtualDesktopIndicator-Setup-1.0.0.exe` 를 내려받아 실행하면 됩니다. (.NET 설치 불필요)
 
 ## 설치 (권장)
@@ -121,8 +121,9 @@ Remove-Item publish-sc\*.pdb -EA SilentlyContinue
 - **현재 위치 감지**: 레지스트리를 직접 읽습니다
   (`...\Explorer\VirtualDesktops\VirtualDesktopIDs` 순서 목록 + `CurrentVirtualDesktop`).
   비공개 COM에 의존하지 않아 버전 무관하게 동작합니다.
-- **데스크톱 이동**: `Win+Ctrl+←/→` 키 입력을 시뮬레이션합니다. 현재 번호를 읽어
-  목표 번호까지 필요한 만큼 이동합니다. Windows 기본 단축키와 동일하므로 안정적입니다.
+- **데스크톱 이동**: 내부 COM(`SwitchDesktop`)으로 목표 데스크톱에 직접 전환하며,
+  이 인터페이스가 없거나 빌드가 달라지면 `Win+Ctrl+←/→` 키 입력 방식으로 자동 폴백합니다
+  (위 "데스크톱 전환 동작" 참고). 폴백 경로는 Windows 기본 단축키라 항상 동작합니다.
 - **모든 데스크톱에서 표시**: 문서화된 공개 COM 인터페이스
   `IVirtualDesktopManager.MoveWindowToDesktop` 로 오버레이를 현재 데스크톱으로 옮깁니다
   (Windows 10 1607부터 안정적).
