@@ -1,0 +1,15 @@
+# Build output
+bin/
+obj/
+publish-sc/
+
+# Installer is distributed via GitHub Releases, not committed to the repo
+installer/
+
+# Debug / local
+*.user
+debug.log
+
+# OS
+Thumbs.db
+Desktop.ini
