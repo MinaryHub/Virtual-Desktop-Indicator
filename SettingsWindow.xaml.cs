@@ -33,8 +33,17 @@ public partial class SettingsWindow : Window
         VersionText.Text = $"Version {AppVersion.Display}";
         AutoStartCheck.IsChecked = StartupManager.IsEnabled();
 
+        MultiMonitorCheck.IsChecked = _config.ShowOnAllMonitors;
+        OpacitySlider.Value = Math.Round(Math.Clamp(_config.Opacity, 0.05, 1.0) * 100);
+
         BuildRows();
         SeedFromConfig();
+    }
+
+    private void OnOpacityChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (OpacityValueText != null)
+            OpacityValueText.Text = $"{(int)e.NewValue}%";
     }
 
     /// <summary>All key tokens offered in the combobox, in a sensible order.</summary>
@@ -233,6 +242,9 @@ public partial class SettingsWindow : Window
         for (int d = 1; d <= MaxDesktops; d++)
             if (!string.IsNullOrEmpty(combos[d]))
                 _config.Hotkeys.Add(new HotkeyBinding { Hotkey = combos[d]!, Desktop = d });
+
+        _config.ShowOnAllMonitors = MultiMonitorCheck.IsChecked == true;
+        _config.Opacity = Math.Clamp(OpacitySlider.Value / 100.0, 0.05, 1.0);
 
         StartupManager.SetEnabled(AutoStartCheck.IsChecked == true);
 

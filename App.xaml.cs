@@ -8,7 +8,7 @@ namespace VirtualDesktopIndicator;
 
 public partial class App : System.Windows.Application
 {
-    private OverlayWindow? _overlay;
+    private OverlayController? _controller;
     private Forms.NotifyIcon? _tray;
     private Forms.ToolStripMenuItem? _autoStartItem;
     private SettingsWindow? _settings;
@@ -26,13 +26,13 @@ public partial class App : System.Windows.Application
 
         _config = AppConfig.Load();
 
-        _overlay = new OverlayWindow(_config);
-        _overlay.Show();
+        _controller = new OverlayController(_config);
+        _controller.Start();
 
         SetupTray();
 
         // Surface any hotkeys that Windows refused to register (e.g. taken by another app).
-        var failed = _overlay.FailedHotkeys;
+        var failed = _controller.FailedHotkeys;
         if (failed.Count > 0)
         {
             _tray!.BalloonTipTitle = "Some hotkeys could not be registered";
@@ -111,9 +111,9 @@ public partial class App : System.Windows.Application
     private void OnSettingsSaved()
     {
         // Config object was mutated & saved by the settings window; re-apply it live.
-        _overlay?.ApplyConfig(_config);
+        _controller?.ApplyConfig(_config);
 
-        var failed = _overlay?.FailedHotkeys ?? [];
+        var failed = _controller?.FailedHotkeys ?? [];
         if (failed.Count > 0 && _tray != null)
         {
             _tray.BalloonTipTitle = "Some hotkeys could not be registered";
@@ -148,14 +148,14 @@ public partial class App : System.Windows.Application
     private void ReloadConfig()
     {
         _config = AppConfig.Load();
-        _overlay?.ApplyConfig(_config);
+        _controller?.ApplyConfig(_config);
     }
 
     private void SetPosition(string position)
     {
         _config.Position = position;
         _config.Save();
-        _overlay?.ApplyConfig(_config);
+        _controller?.ApplyConfig(_config);
     }
 
     private void ExitApp()
@@ -166,7 +166,7 @@ public partial class App : System.Windows.Application
             _tray.Dispose();
             _tray = null;
         }
-        _overlay?.Close();
+        _controller?.Dispose();
         Shutdown();
     }
 

@@ -146,8 +146,9 @@ Open it by double-clicking the tray icon or via the **Settings...** menu.
 | Key | Description | Default |
 |-----|-------------|---------|
 | `Position` | Overlay position: `TopLeft` `TopCenter` `TopRight` `BottomLeft` `BottomCenter` `BottomRight` `Center` | `TopCenter` |
+| `ShowOnAllMonitors` | Show the indicator on every monitor (same position on each); when `false`, primary monitor only | `true` |
 | `MarginX` / `MarginY` | Margin from the edge (px) | `0` / `12` |
-| `Opacity` | Background opacity (0.05 ~ 1.0) | `0.55` |
+| `Opacity` | Overlay (desktop-number) opacity (0.05 ~ 1.0) | `0.5` |
 | `FontSize` | Number font size | `28` |
 | `ShowNumber` | Show the number | `true` |
 | `ShowCount` | Use the `2 / 5` format (include total count) | `true` |

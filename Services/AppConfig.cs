@@ -18,8 +18,15 @@ public sealed class AppConfig
     public double MarginX { get; set; } = 0;
     public double MarginY { get; set; } = 12;
 
+    /// <summary>
+    /// Show the indicator on every monitor at the same <see cref="Position"/> (default), or only
+    /// on the primary monitor when false.
+    /// </summary>
+    public bool ShowOnAllMonitors { get; set; } = true;
+
     // --- Overlay appearance --------------------------------------------------
-    public double Opacity { get; set; } = 0.55;
+    /// <summary>Overlay (desktop-number) opacity, 0.05–1.0. Default 0.5 = 50%.</summary>
+    public double Opacity { get; set; } = 0.5;
     public double FontSize { get; set; } = 28;
     public bool ShowNumber { get; set; } = true;
     public bool ShowCount { get; set; } = true;   // "2 / 4" instead of just "2"

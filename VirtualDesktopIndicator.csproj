@@ -17,7 +17,7 @@
          by the StampBuildVersion target below (see build.counter).
          CI passes an explicit -p:Version=<tag> and -p:SkipVersionStamp=true
          so release builds carry the exact tag version instead of a local counter. -->
-    <VersionPrefix>1.2.1</VersionPrefix>
+    <VersionPrefix>1.3.0</VersionPrefix>
 
     <!-- DPI is configured via app.manifest (WPF-primary app); silence the WinForms-specific hint. -->
     <NoWarn>WFO0003</NoWarn>
