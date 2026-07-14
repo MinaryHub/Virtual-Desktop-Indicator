@@ -41,7 +41,10 @@ public partial class App : System.Windows.Application
         }
 
         // Check for a newer release in the background; only speak up if one exists.
-        _ = CheckForUpdatesAsync(silentIfNoUpdate: true);
+        // The MSIX/Store build must NOT self-update (Store policy: updates ship through the
+        // Store), so the GitHub update flow is skipped entirely when running packaged.
+        if (!PackageContext.IsPackaged)
+            _ = CheckForUpdatesAsync(silentIfNoUpdate: true);
     }
 
     private async Task CheckForUpdatesAsync(bool silentIfNoUpdate)
@@ -57,7 +60,9 @@ public partial class App : System.Windows.Application
         menu.Items.Add(new Forms.ToolStripMenuItem($"Virtual Desktop Indicator {AppVersion.Display}") { Enabled = false });
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("Settings...", null, (_, _) => OpenSettings());
-        menu.Items.Add("Check for updates...", null, (_, _) => _ = CheckForUpdatesAsync(silentIfNoUpdate: false));
+        // The Store build updates through the Store, so hide the manual GitHub update check there.
+        if (!PackageContext.IsPackaged)
+            menu.Items.Add("Check for updates...", null, (_, _) => _ = CheckForUpdatesAsync(silentIfNoUpdate: false));
 
         _autoStartItem = new Forms.ToolStripMenuItem("Run at Windows startup")
         {

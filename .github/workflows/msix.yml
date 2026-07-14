@@ -1,0 +1,91 @@
+name: Build MSIX (Store)
+
+# Builds the Microsoft Store MSIX package. Run manually from the Actions tab and give it a
+# version (e.g. 1.3.2). The resulting .msix is uploaded as a workflow artifact — download it
+# and upload it to Partner Center. The Store re-signs the package, so no certificate is needed
+# here. (Requires the three Partner Center identity placeholders in
+# packaging/msix/Package.appxmanifest to be filled in first, or the package won't match your
+# reserved Store identity.)
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Package version (x.y.z — revision .0 is appended automatically)'
+        required: true
+        default: '1.3.2'
+
+permissions:
+  contents: read
+
+jobs:
+  msix:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Publish (self-contained, win-x64)
+        shell: pwsh
+        run: |
+          $ver = "${{ github.event.inputs.version }}"
+          dotnet publish -c Release -r win-x64 --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:SkipVersionStamp=true `
+            -p:Version=$ver `
+            -p:AssemblyVersion=$ver `
+            -p:FileVersion=$ver `
+            -p:InformationalVersion=$ver `
+            -o publish-msix
+          Remove-Item publish-msix\*.pdb -ErrorAction SilentlyContinue
+
+      - name: Stage package layout
+        shell: pwsh
+        run: |
+          $ver = "${{ github.event.inputs.version }}"
+          $stage = "msix-stage"
+          New-Item -ItemType Directory -Force -Path $stage | Out-Null
+          # App payload
+          Copy-Item publish-msix\* $stage -Recurse -Force
+          # Assets + manifest (MakeAppx expects the manifest named AppxManifest.xml at the root)
+          Copy-Item packaging\msix\Assets $stage\Assets -Recurse -Force
+          Copy-Item packaging\msix\Package.appxmanifest $stage\AppxManifest.xml -Force
+          # Stamp the 4-part version (revision must be 0 for the Store)
+          $manifest = "$stage\AppxManifest.xml"
+          # -creplace (case-SENSITIVE): change only the Identity's capital-V Version, not the
+          # lowercase version="1.0" in the <?xml?> declaration. Write UTF-8 without a BOM.
+          $stamped = (Get-Content $manifest -Raw) -creplace 'Version="[0-9.]+"', "Version=""$ver.0"""
+          [System.IO.File]::WriteAllText($manifest, $stamped, (New-Object System.Text.UTF8Encoding($false)))
+          Write-Host "Staged version $ver.0"
+          if (Select-String -Path $manifest -Pattern 'PLACEHOLDER' -Quiet) {
+            Write-Warning "AppxManifest still contains PLACEHOLDER identity values — the package will NOT match your Partner Center identity. Fill them in before submitting to the Store."
+          }
+
+      - name: Locate MakeAppx
+        id: sdk
+        shell: pwsh
+        run: |
+          $makeappx = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\makeappx.exe" |
+            Sort-Object FullName -Descending | Select-Object -First 1
+          if (-not $makeappx) { throw "makeappx.exe not found in the Windows SDK" }
+          "path=$($makeappx.FullName)" >> $env:GITHUB_OUTPUT
+          Write-Host "Using $($makeappx.FullName)"
+
+      - name: Pack MSIX
+        shell: pwsh
+        run: |
+          $ver = "${{ github.event.inputs.version }}"
+          $out = "VirtualDesktopIndicator-$ver.msix"
+          & "${{ steps.sdk.outputs.path }}" pack /d msix-stage /p $out /o
+          Write-Host "Built $out"
+
+      - name: Upload MSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VirtualDesktopIndicator-msix-${{ github.event.inputs.version }}
+          path: VirtualDesktopIndicator-*.msix
+          if-no-files-found: error

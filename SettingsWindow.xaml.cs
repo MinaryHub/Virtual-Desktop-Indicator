@@ -33,6 +33,10 @@ public partial class SettingsWindow : Window
         VersionText.Text = $"Version {AppVersion.Display}";
         AutoStartCheck.IsChecked = StartupManager.IsEnabled();
 
+        // The Store build updates through the Store, so drop the manual GitHub update check.
+        if (PackageContext.IsPackaged)
+            UpdateButton.Visibility = System.Windows.Visibility.Collapsed;
+
         MultiMonitorCheck.IsChecked = _config.ShowOnAllMonitors;
         SmoothSwitchCheck.IsChecked = _config.SmoothSwitch;
         OpacitySlider.Value = Math.Round(Math.Clamp(_config.Opacity, 0.05, 1.0) * 100);

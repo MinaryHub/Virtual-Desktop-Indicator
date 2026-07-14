@@ -2,6 +2,9 @@
 bin/
 obj/
 publish-sc/
+publish-msix/
+msix-stage/
+*.msix
 
 # Installer is distributed via GitHub Releases, not committed to the repo
 installer/

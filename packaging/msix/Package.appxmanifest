@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MSIX manifest for the Microsoft Store / sideloaded build.
+
+  Packaged as a full-trust Win32 desktop app (EntryPoint=Windows.FullTrustApplication):
+  SendInput, RegisterHotKey and the registry reads all keep working exactly as in the
+  plain-exe build. The only packaged-specific behaviour lives behind PackageContext:
+  self-update is disabled and "run at startup" uses the windows.startupTask below.
+
+  ►► THREE VALUES BELOW ARE PARTNER-CENTER PLACEHOLDERS — replace before submitting.
+     They read "PLACEHOLDER" so the package still builds locally for testing; the build
+     scripts warn while any remain. Copy the exact values from:
+     Identity/@Name              → Partner Center ▸ Product ▸ Product identity ▸ "Package/Identity/Name"
+     Identity/@Publisher         → same page ▸ "Package/Identity/Publisher"
+     Properties/PublisherDisplayName → same page ▸ "Package/Properties/PublisherDisplayName"
+  The Store re-signs the package on ingestion, so no code-signing certificate is needed
+  for Store distribution. Identity/@Version must be 4-part with revision 0 (CI stamps it).
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap uap5 rescap">
+
+  <Identity
+    Name="VirtualDesktopIndicator.PLACEHOLDER"
+    Publisher="CN=PLACEHOLDER"
+    Version="1.0.0.0"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>Virtual Desktop Indicator</DisplayName>
+    <PublisherDisplayName>PLACEHOLDER</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-us" />
+    <Resource Language="ko-kr" />
+  </Resources>
+
+  <Applications>
+    <Application Id="VirtualDesktopIndicator"
+                 Executable="VirtualDesktopIndicator.exe"
+                 EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="Virtual Desktop Indicator"
+        Description="Always-on-top indicator showing the current Windows virtual desktop, with hotkeys to jump to any desktop."
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile
+          Wide310x150Logo="Assets\Wide310x150Logo.png"
+          Square71x71Logo="Assets\Square71x71Logo.png"
+          Square310x310Logo="Assets\Square310x310Logo.png" />
+        <uap:SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="transparent" />
+      </uap:VisualElements>
+
+      <Extensions>
+        <!-- "Run at Windows startup". Ships disabled; the app requests enable via the
+             StartupTask API (StartupManager), and the user can override in Task Manager.
+             TaskId must equal StartupManager.TaskId. -->
+        <uap5:Extension Category="windows.startupTask">
+          <uap5:StartupTask
+            TaskId="VirtualDesktopIndicatorStartup"
+            Enabled="false"
+            DisplayName="Virtual Desktop Indicator" />
+        </uap5:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <!-- Full-trust Win32 app: needed for SendInput key synthesis, global hotkeys and
+         the virtual-desktop registry reads. This is the standard capability for a
+         Desktop-Bridge packaged app and is allowed for Store submission. -->
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>
