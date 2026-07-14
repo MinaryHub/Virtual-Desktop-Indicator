@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <!-- WinExe on Avalonia/Linux simply means "no console window"; it is cross-platform. -->
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <AssemblyName>virtual-desktop-indicator</AssemblyName>
+    <RootNamespace>VirtualDesktopIndicator.Linux</RootNamespace>
+
+    <!-- Same auto-versioning scheme as the Windows app; CI overrides via -p:Version + SkipVersionStamp. -->
+    <VersionPrefix>1.2.0</VersionPrefix>
+
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.3" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.3" />
+  </ItemGroup>
+
+  <!-- Auto-increment the build number on every build (see build.counter). Mirrors the
+       StampBuildVersion target in the Windows project; CI passes -p:SkipVersionStamp=true. -->
+  <Target Name="StampBuildVersion"
+          Condition="'$(SkipVersionStamp)' != 'true'"
+          BeforeTargets="GenerateAssemblyInfo;GetAssemblyVersion;CoreCompile">
+    <PropertyGroup>
+      <BuildCounterFile>$(MSBuildProjectDirectory)\build.counter</BuildCounterFile>
+    </PropertyGroup>
+    <ReadLinesFromFile File="$(BuildCounterFile)" Condition="Exists('$(BuildCounterFile)')">
+      <Output TaskParameter="Lines" PropertyName="_PrevBuildCounter" />
+    </ReadLinesFromFile>
+    <PropertyGroup>
+      <_PrevBuildCounter Condition="'$(_PrevBuildCounter)' == ''">0</_PrevBuildCounter>
+      <_NextBuildCounter>$([MSBuild]::Add($(_PrevBuildCounter), 1))</_NextBuildCounter>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(BuildCounterFile)" Lines="$(_NextBuildCounter)" Overwrite="true" />
+    <PropertyGroup>
+      <Version>$(VersionPrefix).$(_NextBuildCounter)</Version>
+      <AssemblyVersion>$(VersionPrefix).$(_NextBuildCounter)</AssemblyVersion>
+      <FileVersion>$(VersionPrefix).$(_NextBuildCounter)</FileVersion>
+      <InformationalVersion>$(VersionPrefix).$(_NextBuildCounter)</InformationalVersion>
+    </PropertyGroup>
+    <Message Importance="high" Text="Stamped version $(Version)" />
+  </Target>
+
+</Project>

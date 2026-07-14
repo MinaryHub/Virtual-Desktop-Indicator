@@ -13,9 +13,12 @@ desktop with custom hotkeys**.
 
 ## Download
 
-Get the latest installer from the **[Releases page](https://github.com/knoxxr/Virtual-Desktop-Indicator/releases/latest)**.
-Download and run `VirtualDesktopIndicator-Setup-<version>.exe`. (No .NET install required.)
-If it is already installed, the app checks for a newer version on startup (see "Updates" below).
+Get the latest build from the **[Releases page](https://github.com/knoxxr/Virtual-Desktop-Indicator/releases/latest)** (no .NET install required):
+
+- **Windows**: `VirtualDesktopIndicator-Setup-<version>.exe` — download and run it.
+- **Linux (X11)**: `VirtualDesktopIndicator-linux-x64-<version>.tar.gz` — extract and run `./install.sh` (see [Linux (X11)](#linux-x11) below).
+
+On Windows, if it is already installed the app checks for a newer version on startup (see "Updates" below).
 
 ## Install (recommended)
 
@@ -37,6 +40,39 @@ Double-click it and follow the wizard.
 dotnet run -c Release              # run
 dotnet publish -c Release          # framework-dependent exe (.NET runtime required)
 ```
+
+## Linux (X11)
+
+A separate build under [linux/](linux/) targets **Linux/X11** using Avalonia UI.
+It provides the same overlay, global hotkeys, tray menu, settings window, and
+update check, adapted to Linux:
+
+- **Desktop detection/switching** uses the EWMH X11 protocol
+  (`_NET_CURRENT_DESKTOP` / `_NET_NUMBER_OF_DESKTOPS` / `_NET_DESKTOP_NAMES`) — the
+  documented interface supported by GNOME/Xorg, KDE/X11, XFCE, and most WMs.
+- **Global hotkeys** use X11 key grabs (`XGrabKey`). The "Windows" modifier is the
+  **Super** key on Linux; defaults remain `Ctrl+Alt+1`…`Ctrl+Alt+9`.
+- **Autostart** writes a freedesktop entry to `~/.config/autostart`.
+- **Config** lives at `~/.config/VirtualDesktopIndicator/config.json`.
+- On Linux the app does **not** self-install updates; it notifies you and opens
+  the release page.
+
+**Requirements**: an **X11** (Xorg) session — Wayland is not supported by this
+build — and a system tray/AppIndicator (on GNOME, the "AppIndicator" extension).
+
+**Install** (from the released tarball): extract and run `./install.sh`
+(per-user, no root). Build from source:
+
+```bash
+dotnet publish linux/VirtualDesktopIndicator.Linux.csproj \
+  -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o publish-linux
+./publish-linux/virtual-desktop-indicator
+```
+
+> ⚠️ The Linux build has been verified to compile and publish, but has **not yet
+> been runtime-tested on a live X11 desktop**. Please report issues from real
+> GNOME/KDE/XFCE sessions. macOS is not supported: it exposes no public API for
+> the current Space, so the core feature cannot be implemented reliably.
 
 ## Rebuilding the installer
 
@@ -177,4 +213,8 @@ Services/
   VirtualDesktopManagerCom.cs  Public COM (MoveWindowToDesktop) wrapper
   HotKeyManager.cs             Registers/handles global hotkeys
   StartupManager.cs            Toggles run-at-startup (HKCU\Run)
+
+linux/                         Linux/X11 build (Avalonia UI) — overlay, tray,
+                               settings, EWMH desktop detection/switching,
+                               X11 global hotkeys, .desktop autostart, packaging
 ```

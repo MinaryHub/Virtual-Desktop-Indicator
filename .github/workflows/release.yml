@@ -1,16 +1,16 @@
 name: Release
 
-# Push a tag like v1.1.0 to build the installer and publish a GitHub Release.
+# Push a tag like v1.1.0 to build the installers and publish a GitHub Release.
 on:
   push:
     tags:
       - 'v*'
 
 permissions:
-  contents: write   # allow gh release create to write releases/assets
+  contents: write   # allow gh release create/upload to write releases/assets
 
 jobs:
-  release:
+  windows:
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -52,7 +52,7 @@ jobs:
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" `
             /DAppVersion=${{ steps.ver.outputs.version }} installer.iss
 
-      - name: Create GitHub Release
+      - name: Create GitHub Release (with Windows installer)
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -61,3 +61,59 @@ jobs:
             "installer\VirtualDesktopIndicator-Setup-${{ steps.ver.outputs.version }}.exe" `
             --title "${{ github.ref_name }}" `
             --generate-notes
+
+  linux:
+    runs-on: ubuntu-latest
+    needs: windows   # the release is created by the windows job; we upload to it
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Resolve version from tag
+        id: ver
+        shell: bash
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+          echo "Release version: $v"
+
+      - name: Publish (self-contained single file, linux-x64)
+        shell: bash
+        run: |
+          VER="${{ steps.ver.outputs.version }}"
+          dotnet publish linux/VirtualDesktopIndicator.Linux.csproj \
+            -c Release -r linux-x64 --self-contained true \
+            -p:PublishSingleFile=true \
+            -p:SkipVersionStamp=true \
+            -p:Version="$VER" \
+            -p:AssemblyVersion="$VER" \
+            -p:FileVersion="$VER" \
+            -p:InformationalVersion="$VER" \
+            -o publish-linux
+          rm -f publish-linux/*.pdb
+
+      - name: Assemble tarball
+        id: pack
+        shell: bash
+        run: |
+          VER="${{ steps.ver.outputs.version }}"
+          STAGE="virtual-desktop-indicator-$VER"
+          TARBALL="VirtualDesktopIndicator-linux-x64-$VER.tar.gz"
+          mkdir -p "$STAGE"
+          cp publish-linux/virtual-desktop-indicator "$STAGE/"
+          cp linux/packaging/install.sh linux/packaging/uninstall.sh "$STAGE/"
+          cp linux/packaging/README.linux.md "$STAGE/README.md"
+          chmod +x "$STAGE/virtual-desktop-indicator" "$STAGE"/*.sh
+          tar czf "$TARBALL" "$STAGE"
+          echo "tarball=$TARBALL" >> "$GITHUB_OUTPUT"
+
+      - name: Upload Linux tarball to release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.ref_name }}" "${{ steps.pack.outputs.tarball }}" --clobber

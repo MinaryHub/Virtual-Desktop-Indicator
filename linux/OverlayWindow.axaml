@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="VirtualDesktopIndicator.Linux.OverlayWindow"
+        Title="Virtual Desktop Indicator"
+        SystemDecorations="None"
+        Background="Transparent"
+        TransparencyLevelHint="Transparent"
+        Topmost="True"
+        ShowInTaskbar="False"
+        CanResize="False"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="Manual"
+        ShowActivated="False"
+        Focusable="False">
+
+    <Border x:Name="Root"
+            CornerRadius="10"
+            Padding="14,8"
+            Background="#000000"
+            Opacity="0.55">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            <TextBlock x:Name="NumberText"
+                       Text="1"
+                       FontWeight="SemiBold"
+                       FontSize="28"
+                       Foreground="White"
+                       VerticalAlignment="Center" />
+            <TextBlock x:Name="NameText"
+                       Text=""
+                       Margin="10,0,0,0"
+                       FontSize="16"
+                       Foreground="White"
+                       Opacity="0.85"
+                       VerticalAlignment="Center" />
+        </StackPanel>
+    </Border>
+</Window>

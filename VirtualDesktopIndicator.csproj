@@ -17,7 +17,7 @@
          by the StampBuildVersion target below (see build.counter).
          CI passes an explicit -p:Version=<tag> and -p:SkipVersionStamp=true
          so release builds carry the exact tag version instead of a local counter. -->
-    <VersionPrefix>1.1.1</VersionPrefix>
+    <VersionPrefix>1.2.0</VersionPrefix>
 
     <!-- DPI is configured via app.manifest (WPF-primary app); silence the WinForms-specific hint. -->
     <NoWarn>WFO0003</NoWarn>
@@ -25,7 +25,18 @@
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>false</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <!-- Keep the SDK's default globbing from scanning into linux/ below. -->
+    <EnableDefaultItems>true</EnableDefaultItems>
   </PropertyGroup>
+
+  <!-- The Linux/X11 build lives in linux/ as its own project; exclude it from the
+       Windows project's implicit **/* globs so its sources/obj aren't compiled here. -->
+  <ItemGroup>
+    <Compile Remove="linux/**/*.cs" />
+    <Page Remove="linux/**/*.xaml" />
+    <None Remove="linux/**" />
+    <EmbeddedResource Remove="linux/**" />
+  </ItemGroup>
 
   <!--
     Auto-increment the build number on every build.
