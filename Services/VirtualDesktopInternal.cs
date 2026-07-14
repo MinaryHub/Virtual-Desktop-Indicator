@@ -56,7 +56,13 @@ public static class VirtualDesktopInternal
         IVirtualDesktop FindDesktop(ref Guid desktopid);
     }
 
-    /// <summary>True once we've confirmed the interface binds on this machine.</summary>
+    /// <summary>
+    /// Set only when the interface can NEVER work on this machine (the COM class itself doesn't
+    /// exist). A transient runtime failure (RPC disconnect during an explorer restart, a momentary
+    /// shell hiccup) must NOT latch this — otherwise one blip permanently degrades every future jump
+    /// to keystroke stepping, which looks like "direct jumps worked at first, then started stepping
+    /// through 2,3,4 forever." Those get one clean retry on the next call instead.
+    /// </summary>
     private static bool _knownUnavailable;
 
     /// <summary>
@@ -99,8 +105,10 @@ public static class VirtualDesktopInternal
         }
         catch (Exception ex)
         {
-            Log.Write($"VDInternal: unavailable ({ex.GetType().Name}: {ex.Message}); using fallback");
-            _knownUnavailable = true; // don't keep retrying a broken interface every hotkey
+            // Transient: log and fall back for THIS call only, but leave _knownUnavailable clear so
+            // the next hotkey retries the direct jump. A one-off RPC/shell hiccup must not condemn
+            // the whole session to stepping through intermediate desktops.
+            Log.Write($"VDInternal: transient failure ({ex.GetType().Name}: {ex.Message}); using fallback this time");
             return false;
         }
     }
