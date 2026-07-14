@@ -18,6 +18,7 @@ public partial class OverlayWindow : Window
     private DispatcherTimer? _timer;
     private IntPtr _hwnd = IntPtr.Zero;
     private DesktopInfo? _last;
+    private bool _pinned;
 
     public OverlayWindow(AppConfig config)
     {
@@ -31,6 +32,11 @@ public partial class OverlayWindow : Window
     {
         _hwnd = new WindowInteropHelper(this).Handle;
         MakeClickThroughToolWindow(_hwnd);
+
+        // Pin the app to every desktop so we never have to move the overlay on a switch.
+        // Moving a window across desktops forces the shell to re-enumerate the taskbar
+        // and flickers other apps' buttons; a pinned app is exempt from that.
+        _pinned = VirtualDesktopPinner.Pin();
 
         _hotkeys = new HotKeyManager(_hwnd);
         _hotkeys.DesktopRequested += DesktopSwitcher.SwitchTo;
@@ -110,8 +116,10 @@ public partial class OverlayWindow : Window
             Reposition();
         }
 
-        // Keep the overlay on whatever desktop the user is currently viewing.
-        if (_com.IsAvailable && _hwnd != IntPtr.Zero && !_com.IsWindowOnCurrentDesktop(_hwnd))
+        // Keep the overlay on whatever desktop the user is currently viewing. When the window
+        // is pinned to all desktops this is unnecessary — and moving it each switch is exactly
+        // what makes the taskbar buttons flicker — so only fall back to moving if pinning failed.
+        if (!_pinned && _com.IsAvailable && _hwnd != IntPtr.Zero && !_com.IsWindowOnCurrentDesktop(_hwnd))
             _com.MoveWindowToDesktop(_hwnd, info.CurrentId);
     }
 

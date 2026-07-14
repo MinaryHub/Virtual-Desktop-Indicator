@@ -19,6 +19,11 @@ public partial class App : System.Windows.Application
         base.OnStartup(e);
 
         Log.Write("=== app startup ===");
+
+        // Give the process an explicit AppUserModelID before any window exists, so the overlay
+        // inherits it and we can pin that id to all desktops (see VirtualDesktopPinner).
+        VirtualDesktopPinner.SetAppId();
+
         _config = AppConfig.Load();
 
         _overlay = new OverlayWindow(_config);
