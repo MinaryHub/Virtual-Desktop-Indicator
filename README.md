@@ -1,169 +1,180 @@
 # Virtual Desktop Indicator
 
-Windows 가상 데스크톱의 **현재 위치를 화면에 반투명하게 상시 표시**하고,
-**사용자 지정 단축키로 특정 데스크톱으로 즉시 이동**하는 트레이 앱입니다.
+A tray app that **always shows your current Windows virtual desktop as a
+translucent on-screen overlay** and lets you **jump straight to a specific
+desktop with custom hotkeys**.
 
-- 화면 상단(기본값)에 `현재번호 / 전체개수  데스크톱이름` 을 반투명·클릭 통과 오버레이로 표시
-- 모든 가상 데스크톱에서 오버레이가 따라다니며 보임
-- `Ctrl+Alt+1` ~ `Ctrl+Alt+9` (기본값)로 해당 번호의 데스크톱으로 즉시 이동
-- 위치·투명도·글꼴 크기·색상·단축키를 설정 파일로 자유롭게 변경
-- **GitHub Releases 기반 업데이트 확인 및 원클릭 자동 업데이트**
-- 현재 **버전**을 트레이 메뉴·설정 창에 표시
+- Shows `current / total  desktop-name` as a translucent, click-through overlay at the top of the screen (default)
+- The overlay follows you and stays visible across all virtual desktops
+- Jump to a desktop instantly with `Ctrl+Alt+1` ~ `Ctrl+Alt+9` (defaults)
+- Freely change position, opacity, font size, colors, and hotkeys via the config file
+- **Update check via GitHub Releases with one-click auto-update**
+- Shows the current **version** in the tray menu and settings window
 
-## 다운로드
+## Download
 
-최신 설치 파일은 **[Releases 페이지](https://github.com/knoxxr/Virtual-Desktop-Indicator/releases/latest)** 에서 받으세요.
-`VirtualDesktopIndicator-Setup-<버전>.exe` 를 내려받아 실행하면 됩니다. (.NET 설치 불필요)
-이미 설치되어 있다면 앱이 시작 시 자동으로 새 버전을 확인합니다(아래 "업데이트" 참고).
+Get the latest installer from the **[Releases page](https://github.com/knoxxr/Virtual-Desktop-Indicator/releases/latest)**.
+Download and run `VirtualDesktopIndicator-Setup-<version>.exe`. (No .NET install required.)
+If it is already installed, the app checks for a newer version on startup (see "Updates" below).
 
-## 설치 (권장)
+## Install (recommended)
 
-설치 파일: **`installer/VirtualDesktopIndicator-Setup-<버전>.exe`**
+Installer: **`installer/VirtualDesktopIndicator-Setup-<version>.exe`**
 
-더블클릭 → 마법사를 따라가면 설치됩니다.
+Double-click it and follow the wizard.
 
-- **.NET 설치 불필요** — 런타임이 포함된 self-contained 빌드라 대상 PC에 아무것도 미리 깔 필요가 없습니다.
-- **관리자 권한 불필요** — 현재 사용자에게만 설치(`%LocalAppData%\Programs\Virtual Desktop Indicator`)됩니다.
-- 설치 중 **바탕 화면 바로 가기**(선택)와 **Windows 시작 시 자동 실행**(기본 체크)을 고를 수 있습니다.
-- 제거는 **설정 → 앱 → 설치된 앱** 또는 시작 메뉴의 *"Virtual Desktop Indicator 제거"* 로 하며,
-  자동 실행 항목도 함께 정리됩니다.
+- **No .NET install required** — it is a self-contained build with the runtime bundled, so nothing needs to be pre-installed on the target PC.
+- **No admin rights required** — installs for the current user only (`%LocalAppData%\Programs\Virtual Desktop Indicator`).
+- During setup you can choose a **desktop shortcut** (optional) and **Run at Windows startup** (checked by default).
+- Uninstall from **Settings → Apps → Installed apps** or the Start-menu entry *"Uninstall Virtual Desktop Indicator"*; the autostart entry is cleaned up too.
 
-## 요구 사항 / 소스 실행
+## Requirements / running from source
 
-- Windows 10/11 (64비트)
-- 소스에서 개발/실행하려면 [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0):
+- Windows 10/11 (64-bit)
+- To build/run from source, [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0):
 
 ```powershell
-dotnet run -c Release              # 실행
-dotnet publish -c Release          # 프레임워크 종속 exe(.NET 런타임 필요)
+dotnet run -c Release              # run
+dotnet publish -c Release          # framework-dependent exe (.NET runtime required)
 ```
 
-## 설치 파일 다시 빌드하기
+## Rebuilding the installer
 
-[Inno Setup 6](https://jrsoftware.org/isdl.php) 필요 (`winget install JRSoftware.InnoSetup`).
+Requires [Inno Setup 6](https://jrsoftware.org/isdl.php) (`winget install JRSoftware.InnoSetup`).
 
 ```powershell
-# 1) 런타임 포함 self-contained 게시
+# 1) Publish a self-contained build (runtime bundled)
 dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish-sc
 Remove-Item publish-sc\*.pdb -EA SilentlyContinue
-# 2) 설치 파일 컴파일 (installer\ 에 Setup.exe 생성)
+# 2) Compile the installer (produces Setup.exe under installer\)
 & "$env:LocalAppData\Programs\Inno Setup 6\ISCC.exe" installer.iss
 ```
 
-설치 마법사 구성은 [installer.iss](installer.iss) 에 있습니다(버전·바로가기·자동 실행 등).
+The wizard configuration lives in [installer.iss](installer.iss) (version, shortcuts, autostart, etc.).
 
-## 트레이 메뉴
+> **Releases are automated.** Pushing a tag like `v1.1.0` triggers the
+> [release workflow](.github/workflows/release.yml), which publishes the
+> self-contained build, compiles the Inno Setup installer, and creates a
+> GitHub Release with the installer attached — no local Inno Setup needed.
 
-작업 표시줄 우측 **VD** 아이콘을 우클릭(또는 더블클릭 → 설정 창):
+## Tray menu
 
-- 메뉴 맨 위에 현재 **버전**(`v1.0.0.x`)이 표시됩니다
-- **설정...** — 단축키 변경 및 자동 실행을 설정하는 창을 엽니다
-- **업데이트 확인...** — GitHub Releases에서 새 버전을 조회합니다(아래 "업데이트" 참고)
-- **Windows 시작 시 자동 실행** — 체크하면 로그인 시 자동 실행 (per-user, 관리자 권한 불필요)
-- **설정 파일 열기** — `config.json`을 기본 편집기로 엽니다
-- **설정 다시 읽기** — 파일을 직접 수정한 뒤 즉시 반영
-- **위치** — 오버레이 위치를 빠르게 변경 (TopCenter, TopRight 등)
-- **종료**
+Right-click the **VD** icon in the notification area (or double-click → settings window):
 
-## 설정 창 (단축키 변경)
+- The current **version** (`v1.1.0.x`) is shown at the top of the menu
+- **Settings...** — opens the window to change hotkeys and autostart
+- **Check for updates...** — queries GitHub Releases for a newer version (see "Updates")
+- **Run at Windows startup** — when checked, launches at logon (per-user, no admin rights)
+- **Open config file** — opens `config.json` in the default editor
+- **Reload config** — apply changes made by editing the file directly
+- **Position** — quickly change the overlay position (TopCenter, TopRight, etc.)
+- **Exit**
 
-트레이 아이콘 더블클릭 또는 **설정...** 메뉴로 엽니다.
+## Settings window (changing hotkeys)
 
-- **Windows 시작 시 자동 실행** 체크박스
-- **단축키** — 데스크톱 1~9 각각에 대해 수식어 체크박스(`Win` `Ctrl` `Shift` `Alt`)를
-  체크하고 오른쪽 **키 콤보박스**에서 키를 고릅니다.
-  예: `Ctrl` `Alt` 체크 + 키 `3` 선택 → `Ctrl+Alt+3` 으로 지정됨.
-  - 키 콤보박스에서 `(없음)`을 고르거나 **지우기** 버튼으로 해당 단축키를 비웁니다
-  - 최소 하나의 수식어(`Ctrl`/`Alt`/`Shift`/`Win`)와 키가 함께 필요하며, 중복 조합은 저장 시 경고합니다
-  - **저장**을 누르면 즉시 적용됩니다(재시작 불필요)
-- 창 하단에 현재 **버전**과 **업데이트 확인** 버튼이 있습니다
+Open it by double-clicking the tray icon or via the **Settings...** menu.
 
-## 업데이트 (버전 관리 · 자동 업데이트)
+- **Run at Windows startup** checkbox
+- **Hotkeys** — for each desktop 1–9, check the modifier checkboxes
+  (`Win` `Ctrl` `Shift` `Alt`) and pick a key from the **key combobox** on the right.
+  Example: check `Ctrl` `Alt` + select key `3` → assigns `Ctrl+Alt+3`.
+  - Select `(none)` in the key combobox or press the **Clear** button to empty a hotkey
+  - At least one modifier (`Ctrl`/`Alt`/`Shift`/`Win`) plus a key is required; duplicate combinations are warned about on save
+  - Press **Save** to apply immediately (no restart needed)
+- The current **version** and a **Check for updates** button are at the bottom of the window
 
-- **버전 자동 부여** — 빌드할 때마다 `build.counter`가 1씩 증가하여 앱 버전이
-  `1.0.0.<빌드번호>` 형식으로 자동 스탬핑됩니다([csproj](VirtualDesktopIndicator.csproj)의
-  `StampBuildVersion` 타깃). 릴리스용으로 의미 있는 버전을 올릴 때는 csproj의
-  `<VersionPrefix>` 만 손으로 수정하면 됩니다. 설치 파일 버전도 게시된 exe에서 자동으로 읽어옵니다.
-- **업데이트 확인** — 앱 시작 시 백그라운드로 GitHub Releases의 최신 버전을 조회합니다
-  (새 버전이 없거나 네트워크 오류일 때는 조용히 넘어갑니다). 트레이 메뉴의
-  **업데이트 확인...** 또는 설정 창의 **업데이트 확인** 버튼으로 수동 조회도 가능합니다.
-- **자동 설치** — 새 버전이 있으면 알림을 띄우고, 사용자가 동의하면 최신 설치 파일
-  (`VirtualDesktopIndicator-Setup-*.exe`)을 내려받아 실행한 뒤 앱을 종료합니다.
-  설치 마법사가 기존 실행 파일을 교체합니다(설치 파일이 첨부되지 않은 릴리스라면 릴리스 페이지를 엽니다).
-- 버전 비교는 `Major.Minor.Patch` 기준이며, 로컬 빌드 번호(4번째 자리)는 무시합니다.
+## Updates (versioning · auto-update)
 
-> 자동 실행은 레지스트리 `HKCU\...\CurrentVersion\Run` 에 실행 파일 경로를 기록합니다.
-> 실행 파일을 다른 위치로 옮겼다면 자동 실행을 껐다 켜서 경로를 갱신하세요.
+- **Automatic versioning** — every build increments `build.counter` by one, so the
+  app version is auto-stamped as `1.1.0.<build>` (the `StampBuildVersion` target in
+  [csproj](VirtualDesktopIndicator.csproj)). To bump to a meaningful release version,
+  just edit `<VersionPrefix>` in the csproj. The installer version is read from the
+  published exe automatically.
+- **Update check** — on startup the app queries the latest GitHub release in the
+  background (it stays quiet when there is no new version or on a network error).
+  You can also check manually via **Check for updates...** in the tray menu or the
+  **Check for updates** button in the settings window.
+- **Auto-install** — when a newer version exists, the app shows a prompt and, on
+  your consent, downloads the latest installer (`VirtualDesktopIndicator-Setup-*.exe`),
+  runs it, and exits. The wizard replaces the existing files (if a release has no
+  installer attached, the release page is opened instead).
+- Version comparison uses `Major.Minor.Patch` only; the local build number (4th part) is ignored.
 
-## 설정 파일
+> Autostart writes the executable path to the registry at `HKCU\...\CurrentVersion\Run`.
+> If you moved the executable, toggle autostart off and on to refresh the path.
 
-`%APPDATA%\VirtualDesktopIndicator\config.json` (최초 실행 시 기본값으로 생성)
+## Config file
 
-| 항목 | 설명 | 기본값 |
-|------|------|--------|
-| `Position` | 오버레이 위치: `TopLeft` `TopCenter` `TopRight` `BottomLeft` `BottomCenter` `BottomRight` `Center` | `TopCenter` |
-| `MarginX` / `MarginY` | 가장자리로부터의 여백(px) | `0` / `12` |
-| `Opacity` | 배경 투명도 (0.05 ~ 1.0) | `0.55` |
-| `FontSize` | 번호 글꼴 크기 | `28` |
-| `ShowNumber` | 번호 표시 여부 | `true` |
-| `ShowCount` | `2 / 5` 형식(전체 개수 포함) 여부 | `true` |
-| `ShowName` | 데스크톱 이름 표시 여부 | `true` |
-| `Foreground` / `Background` | 글자색 / 배경색 (`#RRGGBB`) | 흰색 / 검정 |
-| `CornerRadius` | 모서리 둥글기 | `10` |
-| `PollIntervalMs` | 상태 갱신 주기(ms) | `300` |
-| `Hotkeys` | `{ "Hotkey": "Ctrl+Alt+1", "Desktop": 1 }` 목록 | 1~9번 |
+`%APPDATA%\VirtualDesktopIndicator\config.json` (created with defaults on first run)
 
-**단축키 형식**: `수식어+수식어+키`. 수식어는 `Ctrl` `Alt` `Shift` `Win`,
-키는 `1`~`0`, `A`~`Z`, `F1`~`F24`, 넘패드 숫자 `Num0`~`Num9`.
-예) `Ctrl+Alt+3`, `Ctrl+Alt+F5`, `Ctrl+Win+Num1`. `Desktop`은 1부터 시작하는 데스크톱 번호입니다.
-넘패드 숫자(`Num*`)는 **NumLock이 켜져 있어야** 인식됩니다.
-다른 프로그램이 이미 쓰는 단축키는 등록에 실패하며, 시작 시 풍선 알림으로 알려줍니다.
+| Key | Description | Default |
+|-----|-------------|---------|
+| `Position` | Overlay position: `TopLeft` `TopCenter` `TopRight` `BottomLeft` `BottomCenter` `BottomRight` `Center` | `TopCenter` |
+| `MarginX` / `MarginY` | Margin from the edge (px) | `0` / `12` |
+| `Opacity` | Background opacity (0.05 ~ 1.0) | `0.55` |
+| `FontSize` | Number font size | `28` |
+| `ShowNumber` | Show the number | `true` |
+| `ShowCount` | Use the `2 / 5` format (include total count) | `true` |
+| `ShowName` | Show the desktop name | `true` |
+| `Foreground` / `Background` | Text / background color (`#RRGGBB`) | white / black |
+| `CornerRadius` | Corner rounding | `10` |
+| `PollIntervalMs` | State refresh interval (ms) | `300` |
+| `Hotkeys` | List of `{ "Hotkey": "Ctrl+Alt+1", "Desktop": 1 }` | desktops 1–9 |
 
-> ⚠️ `Win+Shift+숫자`, `Win+숫자` 등 일부 조합은 **Windows가 이미 예약**(작업 표시줄 N번째 앱
-> 실행 등)하여 등록에 실패합니다. 그래서 기본값은 충돌 없는 `Ctrl+Alt+숫자`를 사용합니다.
-> 등록에 실패한 단축키는 시작 시 풍선 알림으로 알려주며, 설정 창에서 다른 조합으로 바꾸면 됩니다.
+**Hotkey format**: `modifier+modifier+key`. Modifiers are `Ctrl` `Alt` `Shift` `Win`;
+keys are `1`~`0`, `A`~`Z`, `F1`~`F24`, and numpad digits `Num0`~`Num9`.
+e.g. `Ctrl+Alt+3`, `Ctrl+Alt+F5`, `Ctrl+Win+Num1`. `Desktop` is the 1-based desktop number.
+Numpad digits (`Num*`) are only recognized when **NumLock is on**.
+Hotkeys already used by another program fail to register; you are notified with a balloon tip on startup.
 
-### 데스크톱 전환 동작
+> ⚠️ Some combinations such as `Win+Shift+<digit>` and `Win+<digit>` are **reserved by
+> Windows** (e.g. launching the Nth taskbar app) and fail to register. That is why the
+> defaults use the conflict-free `Ctrl+Alt+<digit>`. Failed hotkeys are reported with a
+> balloon tip on startup; just pick a different combination in the settings window.
 
-기본적으로 Windows 내부 API(`IVirtualDesktopManagerInternal.SwitchDesktop`)로 **목표 데스크톱에
-곧바로 전환**합니다. 여러 칸 떨어져 있어도 중간 데스크톱을 거치지 않고 즉시 이동합니다.
+### Desktop switching behavior
 
-이 내부 API는 문서화되지 않아 Windows 빌드에 따라 바뀔 수 있습니다. 그래서 사용 전 인터페이스가
-정상 연결되는지 검증하고, 실패하면 **자동으로 키 입력 방식(`Win+Ctrl+←/→` 단계 이동)으로 폴백**합니다
-(이 경우 한 칸씩 거쳐 가며 먼 데스크톱은 조금 느립니다). 어느 방식이든 이동 결과는 정확합니다.
+By default the app switches **straight to the target desktop** via the Windows internal
+API (`IVirtualDesktopManagerInternal.SwitchDesktop`). Even if the target is several slots
+away, it jumps directly without stepping through the desktops in between.
 
-> 💡 데스크톱 이름은 작업 보기(`Win+Tab`)에서 데스크톱 이름을 더블클릭해 지정할 수 있습니다.
+This internal API is undocumented and can change between Windows builds. So the app
+verifies the interface connects correctly before use and, on failure, **automatically
+falls back to key-input stepping (`Win+Ctrl+←/→`)** (which steps one desktop at a time,
+so far-away desktops are a bit slower). Either way the result is correct.
 
-## 동작 원리 (안정성 설계)
+> 💡 You can name a desktop by double-clicking its name in Task View (`Win+Tab`).
 
-가상 데스크톱 관련 API는 상당수가 비공개(undocumented)이고 Windows 빌드마다 인터페이스가 바뀌어
-잘 깨집니다. 이 앱은 **빌드 업데이트에 영향받지 않는 방식**만 사용합니다.
+## How it works (stability by design)
 
-- **현재 위치 감지**: 레지스트리를 직접 읽습니다
-  (`...\Explorer\VirtualDesktops\VirtualDesktopIDs` 순서 목록 + `CurrentVirtualDesktop`).
-  비공개 COM에 의존하지 않아 버전 무관하게 동작합니다.
-- **데스크톱 이동**: 내부 COM(`SwitchDesktop`)으로 목표 데스크톱에 직접 전환하며,
-  이 인터페이스가 없거나 빌드가 달라지면 `Win+Ctrl+←/→` 키 입력 방식으로 자동 폴백합니다
-  (위 "데스크톱 전환 동작" 참고). 폴백 경로는 Windows 기본 단축키라 항상 동작합니다.
-- **모든 데스크톱에서 표시**: 문서화된 공개 COM 인터페이스
-  `IVirtualDesktopManager.MoveWindowToDesktop` 로 오버레이를 현재 데스크톱으로 옮깁니다
-  (Windows 10 1607부터 안정적).
+Many virtual-desktop APIs are undocumented and their interfaces change between Windows
+builds, so they break easily. This app uses **only approaches that survive build updates**.
 
-## 구조
+- **Detecting the current position**: reads the registry directly
+  (`...\Explorer\VirtualDesktops\VirtualDesktopIDs` order list + `CurrentVirtualDesktop`).
+  It does not depend on private COM, so it works regardless of version.
+- **Switching desktops**: switches directly to the target via internal COM (`SwitchDesktop`),
+  and automatically falls back to the `Win+Ctrl+←/→` key-input method if that interface is
+  missing or the build differs (see "Desktop switching behavior"). The fallback path uses
+  Windows' built-in shortcuts, so it always works.
+- **Showing on every desktop**: moves the overlay to the current desktop via the documented
+  public COM interface `IVirtualDesktopManager.MoveWindowToDesktop` (stable since Windows 10 1607).
+
+## Structure
 
 ```
-App.xaml(.cs)                  진입점, 트레이 아이콘/메뉴, 시작 시 업데이트 확인
-OverlayWindow.xaml(.cs)        반투명·클릭통과 오버레이, 폴링·재배치·데스크톱 추적
-SettingsWindow.xaml(.cs)       단축키(수식어 체크박스+키 콤보박스) UI + 자동 실행 + 버전/업데이트
-UpdateFlow.cs                  업데이트 알림 → 동의 시 다운로드/설치/종료 공용 UI 흐름
+App.xaml(.cs)                  Entry point, tray icon/menu, startup update check
+OverlayWindow.xaml(.cs)        Translucent click-through overlay, polling/repositioning/desktop tracking
+SettingsWindow.xaml(.cs)       Hotkey UI (modifier checkboxes + key combobox) + autostart + version/update
+UpdateFlow.cs                  Shared UI flow: update prompt → download/install/exit on consent
 Services/
-  AppConfig.cs                 config.json 로드/저장
-  AppVersion.cs                빌드 시 스탬핑된 앱 버전 노출
-  UpdateService.cs             GitHub Releases 최신 버전 조회 + 설치 파일 다운로드/실행
-  VirtualDesktopRegistry.cs    레지스트리에서 현재 번호/개수/이름 읽기
-  DesktopSwitcher.cs           목표 데스크톱으로 이동(내부 COM 우선, 실패 시 키 입력 폴백)
-  VirtualDesktopInternal.cs    내부 COM(SwitchDesktop)으로 직접 전환 + vtable 검증
-  VirtualDesktopManagerCom.cs  공개 COM(MoveWindowToDesktop) 래퍼
-  HotKeyManager.cs             전역 단축키 등록/처리
-  StartupManager.cs            Windows 시작 시 자동 실행(HKCU\Run) 토글
+  AppConfig.cs                 Loads/saves config.json
+  AppVersion.cs                Exposes the app version stamped at build time
+  UpdateService.cs             Queries the latest GitHub release + downloads/runs the installer
+  VirtualDesktopRegistry.cs    Reads current number/count/name from the registry
+  DesktopSwitcher.cs           Moves to the target desktop (internal COM first, key-input fallback)
+  VirtualDesktopInternal.cs    Direct switch via internal COM (SwitchDesktop) + vtable verification
+  VirtualDesktopManagerCom.cs  Public COM (MoveWindowToDesktop) wrapper
+  HotKeyManager.cs             Registers/handles global hotkeys
+  StartupManager.cs            Toggles run-at-startup (HKCU\Run)
 ```

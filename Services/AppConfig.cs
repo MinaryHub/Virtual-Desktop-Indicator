@@ -8,7 +8,7 @@ namespace VirtualDesktopIndicator.Services;
 /// <summary>
 /// User configuration, persisted as JSON under %APPDATA%\VirtualDesktopIndicator\config.json.
 /// The file is created with defaults on first run and can be edited by hand
-/// (tray menu → "설정 파일 열기", then "설정 다시 읽기").
+/// (tray menu → "Open config file", then "Reload config").
 /// </summary>
 public sealed class AppConfig
 {

@@ -30,7 +30,7 @@ public partial class App : System.Windows.Application
         var failed = _overlay.FailedHotkeys;
         if (failed.Count > 0)
         {
-            _tray!.BalloonTipTitle = "일부 단축키를 등록하지 못했습니다";
+            _tray!.BalloonTipTitle = "Some hotkeys could not be registered";
             _tray.BalloonTipText = string.Join("\n", failed);
             _tray.ShowBalloonTip(5000);
         }
@@ -49,12 +49,12 @@ public partial class App : System.Windows.Application
     {
         var menu = new Forms.ContextMenuStrip();
 
-        menu.Items.Add(new Forms.ToolStripMenuItem($"가상 데스크톱 인디케이터 {AppVersion.Display}") { Enabled = false });
+        menu.Items.Add(new Forms.ToolStripMenuItem($"Virtual Desktop Indicator {AppVersion.Display}") { Enabled = false });
         menu.Items.Add(new Forms.ToolStripSeparator());
-        menu.Items.Add("설정...", null, (_, _) => OpenSettings());
-        menu.Items.Add("업데이트 확인...", null, (_, _) => _ = CheckForUpdatesAsync(silentIfNoUpdate: false));
+        menu.Items.Add("Settings...", null, (_, _) => OpenSettings());
+        menu.Items.Add("Check for updates...", null, (_, _) => _ = CheckForUpdatesAsync(silentIfNoUpdate: false));
 
-        _autoStartItem = new Forms.ToolStripMenuItem("Windows 시작 시 자동 실행")
+        _autoStartItem = new Forms.ToolStripMenuItem("Run at Windows startup")
         {
             CheckOnClick = true,
         };
@@ -62,10 +62,10 @@ public partial class App : System.Windows.Application
         menu.Items.Add(_autoStartItem);
 
         menu.Items.Add(new Forms.ToolStripSeparator());
-        menu.Items.Add("설정 파일 열기", null, (_, _) => OpenConfig());
-        menu.Items.Add("설정 다시 읽기", null, (_, _) => ReloadConfig());
+        menu.Items.Add("Open config file", null, (_, _) => OpenConfig());
+        menu.Items.Add("Reload config", null, (_, _) => ReloadConfig());
 
-        var posMenu = new Forms.ToolStripMenuItem("위치");
+        var posMenu = new Forms.ToolStripMenuItem("Position");
         foreach (var pos in new[] { "TopLeft", "TopCenter", "TopRight",
                                     "BottomLeft", "BottomCenter", "BottomRight", "Center" })
         {
@@ -74,7 +74,7 @@ public partial class App : System.Windows.Application
         }
         menu.Items.Add(posMenu);
         menu.Items.Add(new Forms.ToolStripSeparator());
-        menu.Items.Add("종료", null, (_, _) => ExitApp());
+        menu.Items.Add("Exit", null, (_, _) => ExitApp());
 
         // Keep the auto-start checkmark in sync with the registry each time the menu opens.
         menu.Opening += (_, _) => _autoStartItem.Checked = StartupManager.IsEnabled();
@@ -83,7 +83,7 @@ public partial class App : System.Windows.Application
         {
             Icon = BuildIcon(),
             Visible = true,
-            Text = $"가상 데스크톱 인디케이터 {AppVersion.Display}",
+            Text = $"Virtual Desktop Indicator {AppVersion.Display}",
             ContextMenuStrip = menu,
         };
         _tray.DoubleClick += (_, _) => OpenSettings();
@@ -111,7 +111,7 @@ public partial class App : System.Windows.Application
         var failed = _overlay?.FailedHotkeys ?? [];
         if (failed.Count > 0 && _tray != null)
         {
-            _tray.BalloonTipTitle = "일부 단축키를 등록하지 못했습니다";
+            _tray.BalloonTipTitle = "Some hotkeys could not be registered";
             _tray.BalloonTipText = string.Join("\n", failed);
             _tray.ShowBalloonTip(5000);
         }

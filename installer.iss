@@ -39,8 +39,8 @@ ArchitecturesInstallIn64BitMode=x64compatible
 Name: "default"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "바탕 화면에 바로 가기 만들기"; GroupDescription: "추가 아이콘:"; Flags: unchecked
-Name: "autostart";   Description: "Windows 시작 시 자동 실행"; GroupDescription: "시작 옵션:"
+Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional icons:"; Flags: unchecked
+Name: "autostart";   Description: "Run at Windows startup"; GroupDescription: "Startup options:"
 
 [Files]
 Source: "publish-sc\*"; DestDir: "{app}"; Flags: recursesubdirs ignoreversion
@@ -48,7 +48,7 @@ Source: "README.md";    DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#AppName}";              Filename: "{app}\{#AppExe}"
-Name: "{group}\{#AppName} 제거";          Filename: "{uninstallexe}"
+Name: "{group}\Uninstall {#AppName}";     Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#AppName}";        Filename: "{app}\{#AppExe}"; Tasks: desktopicon
 
 [Registry]
@@ -59,7 +59,7 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \
     ValueData: """{app}\{#AppExe}"""; Tasks: autostart; Flags: uninsdeletevalue
 
 [Run]
-Filename: "{app}\{#AppExe}"; Description: "{#AppName} 지금 실행"; \
+Filename: "{app}\{#AppExe}"; Description: "Run {#AppName} now"; \
     Flags: nowait postinstall skipifsilent
 
 [Code]

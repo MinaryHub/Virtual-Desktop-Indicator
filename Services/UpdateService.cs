@@ -48,7 +48,7 @@ public static class UpdateService
         {
             using var resp = await Http.GetAsync(LatestApi, ct);
             if (!resp.IsSuccessStatusCode)
-                return UpdateCheckResult.Fail($"GitHub 응답 오류: {(int)resp.StatusCode}");
+                return UpdateCheckResult.Fail($"GitHub response error: {(int)resp.StatusCode}");
 
             await using var stream = await resp.Content.ReadAsStreamAsync(ct);
             using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
@@ -57,7 +57,7 @@ public static class UpdateService
             string? tag = root.TryGetProperty("tag_name", out var t) ? t.GetString() : null;
             var latest = ParseVersion(tag);
             if (latest == null)
-                return UpdateCheckResult.Fail("릴리스 버전을 해석할 수 없습니다.");
+                return UpdateCheckResult.Fail("Could not parse the release version.");
 
             string? htmlUrl = root.TryGetProperty("html_url", out var h) ? h.GetString() : null;
             string? assetUrl = PickInstallerAsset(root);

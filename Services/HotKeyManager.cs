@@ -54,7 +54,7 @@ public sealed class HotKeyManager : IDisposable
         {
             if (!TryParse(b.Hotkey, out var mods, out var vk))
             {
-                FailedRegistrations.Add($"{b.Hotkey} (형식 오류)");
+                FailedRegistrations.Add($"{b.Hotkey} (invalid format)");
                 continue;
             }
 
@@ -67,7 +67,7 @@ public sealed class HotKeyManager : IDisposable
             else
             {
                 int err = Marshal.GetLastWin32Error();
-                FailedRegistrations.Add($"{b.Hotkey} → 데스크톱 {b.Desktop} (등록 실패)");
+                FailedRegistrations.Add($"{b.Hotkey} → desktop {b.Desktop} (registration failed)");
                 Log.Write($"RegisterHotKey FAIL id={id} '{b.Hotkey}' mods={mods} vk=0x{vk:X2} err={err}");
             }
         }

@@ -22,7 +22,7 @@ public partial class SettingsWindow : Window
     private readonly CheckBox[] _alt = new CheckBox[MaxDesktops + 1];
     private readonly ComboBox[] _key = new ComboBox[MaxDesktops + 1];
 
-    private const string NoKey = "(없음)";
+    private const string NoKey = "(none)";
 
     public SettingsWindow(AppConfig config, Action onSaved)
     {
@@ -30,7 +30,7 @@ public partial class SettingsWindow : Window
         _onSaved = onSaved;
         InitializeComponent();
 
-        VersionText.Text = $"버전 {AppVersion.Display}";
+        VersionText.Text = $"Version {AppVersion.Display}";
         AutoStartCheck.IsChecked = StartupManager.IsEnabled();
 
         BuildRows();
@@ -61,7 +61,7 @@ public partial class SettingsWindow : Window
 
             var label = new TextBlock
             {
-                Text = $"데스크톱 {d}",
+                Text = $"Desktop {d}",
                 VerticalAlignment = VerticalAlignment.Center,
                 FontSize = 13,
             };
@@ -96,7 +96,7 @@ public partial class SettingsWindow : Window
 
             var clear = new Button
             {
-                Content = "지우기",
+                Content = "Clear",
                 Width = 62,
                 Height = 28,
                 Tag = d,
@@ -212,7 +212,7 @@ public partial class SettingsWindow : Window
             combos[d] = BuildCombo(d, out bool invalid);
             if (invalid)
             {
-                ShowStatus($"데스크톱 {d}: 수식어(Ctrl·Alt·Shift·Win) 하나 이상과 키를 함께 지정해야 합니다.");
+                ShowStatus($"Desktop {d}: choose at least one modifier (Ctrl·Alt·Shift·Win) together with a key.");
                 return;
             }
         }
@@ -224,7 +224,7 @@ public partial class SettingsWindow : Window
             var c = combos[d];
             if (!string.IsNullOrEmpty(c) && !seen.Add(c))
             {
-                ShowStatus($"단축키 '{c}' 가 중복되었습니다. 서로 다른 조합을 지정하세요.");
+                ShowStatus($"Hotkey '{c}' is duplicated. Please assign a different combination.");
                 return;
             }
         }
@@ -245,7 +245,7 @@ public partial class SettingsWindow : Window
     {
         UpdateButton.IsEnabled = false;
         var prevContent = UpdateButton.Content;
-        UpdateButton.Content = "확인 중…";
+        UpdateButton.Content = "Checking…";
         try
         {
             var result = await UpdateService.CheckAsync();

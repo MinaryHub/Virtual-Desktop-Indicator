@@ -10,7 +10,7 @@ namespace VirtualDesktopIndicator;
 /// </summary>
 public static class UpdateFlow
 {
-    private const string Caption = "가상 데스크톱 인디케이터";
+    private const string Caption = "Virtual Desktop Indicator";
 
     /// <summary>
     /// Reacts to a completed <see cref="UpdateService.CheckAsync"/> result.
@@ -22,20 +22,20 @@ public static class UpdateFlow
         if (result.Error != null)
         {
             if (!silentIfNoUpdate)
-                Show(owner, $"업데이트 확인에 실패했습니다.\n{result.Error}", MessageBoxImage.Warning);
+                Show(owner, $"Failed to check for updates.\n{result.Error}", MessageBoxImage.Warning);
             return;
         }
 
         if (!result.Available)
         {
             if (!silentIfNoUpdate)
-                Show(owner, $"현재 최신 버전입니다. ({AppVersion.Display})", MessageBoxImage.Information);
+                Show(owner, $"You are on the latest version. ({AppVersion.Display})", MessageBoxImage.Information);
             return;
         }
 
-        var latest = result.LatestVersion?.ToString() ?? "새 버전";
+        var latest = result.LatestVersion?.ToString() ?? "new version";
         var answer = Ask(owner,
-            $"새 버전 v{latest} 이(가) 있습니다. (현재 {AppVersion.Display})\n\n지금 다운로드하여 설치할까요?");
+            $"A new version v{latest} is available. (current {AppVersion.Display})\n\nDownload and install it now?");
         if (answer != MessageBoxResult.Yes) return;
 
         // No installer asset attached → just open the release page.
@@ -55,7 +55,7 @@ public static class UpdateFlow
         {
             Log.Write($"update download/install failed: {ex.Message}");
             var retry = Ask(owner,
-                $"업데이트 다운로드에 실패했습니다.\n{ex.Message}\n\n릴리스 페이지를 여시겠습니까?");
+                $"Failed to download the update.\n{ex.Message}\n\nOpen the release page?");
             if (retry == MessageBoxResult.Yes && !string.IsNullOrEmpty(result.HtmlUrl))
                 UpdateService.OpenReleasePage(result.HtmlUrl);
         }
