@@ -156,6 +156,7 @@ Open it by double-clicking the tray icon or via the **Settings...** menu.
 | `Foreground` / `Background` | Text / background color (`#RRGGBB`) | white / black |
 | `CornerRadius` | Corner rounding | `10` |
 | `PollIntervalMs` | State refresh interval (ms) | `300` |
+| `SmoothSwitch` | Switch with the native animation (no taskbar flicker); `false` = instant COM jump | `true` |
 | `Hotkeys` | List of `{ "Hotkey": "Ctrl+Alt+1", "Desktop": 1 }` | desktops 1–9 |
 
 **Hotkey format**: `modifier+modifier+key`. Modifiers are `Ctrl` `Alt` `Shift` `Win`;

@@ -29,6 +29,8 @@ public sealed class OverlayController : IDisposable
 
     public void Start()
     {
+        DesktopSwitcher.SmoothSwitch = _config.SmoothSwitch;
+
         CreateWindows();
         HookHotkeys();
 
@@ -50,6 +52,7 @@ public sealed class OverlayController : IDisposable
         bool monitorModeChanged = config.ShowOnAllMonitors != _config.ShowOnAllMonitors;
         _config = config;
 
+        DesktopSwitcher.SmoothSwitch = _config.SmoothSwitch;
         if (_timer != null) _timer.Interval = PollInterval();
         _hotkeys?.Register(_config.Hotkeys);
 

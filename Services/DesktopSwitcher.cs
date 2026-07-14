@@ -25,23 +25,34 @@ public static class DesktopSwitcher
     private static int _generation;
 
     /// <summary>
+    /// When true (default), switch by synthesising the native Win+Ctrl+Arrow shortcut — animated,
+    /// identical to a manual switch, and flicker-free. When false, use the instant direct-COM jump.
+    /// Set from <see cref="AppConfig.SmoothSwitch"/>.
+    /// </summary>
+    public static volatile bool SmoothSwitch = true;
+
+    /// <summary>
     /// Jump to an absolute 1-based desktop index (does nothing if already there).
     /// Must be called on the UI (STA) thread — the direct COM path requires it.
     /// </summary>
     public static void SwitchTo(int targetIndex)
     {
-        // Preferred: jump straight to the target via the internal COM interface (no stepping
-        // through intermediate desktops). Runs synchronously on the STA caller thread; it's instant.
-        var ids = VirtualDesktopRegistry.ReadOrderedIds();
-        if (ids is { Length: > 0 })
+        // Instant path (opt-in): jump straight to the target via the internal COM interface (no
+        // stepping through intermediate desktops). It's fast but switches without the animation,
+        // which makes the taskbar buttons flicker — so it's only used when SmoothSwitch is off.
+        if (!SmoothSwitch)
         {
-            int t = Math.Clamp(targetIndex, 1, ids.Length);
-            if (VirtualDesktopInternal.TrySwitch(ids[t - 1], ids.Length))
+            var ids = VirtualDesktopRegistry.ReadOrderedIds();
+            if (ids is { Length: > 0 })
             {
-                Log.Write($"SwitchTo {t}: direct COM switch OK");
-                return;
+                int t = Math.Clamp(targetIndex, 1, ids.Length);
+                if (VirtualDesktopInternal.TrySwitch(ids[t - 1], ids.Length))
+                {
+                    Log.Write($"SwitchTo {t}: direct COM switch OK");
+                    return;
+                }
+                Log.Write($"SwitchTo {t}: direct switch unavailable → keystroke stepping");
             }
-            Log.Write($"SwitchTo {t}: direct switch unavailable → keystroke stepping");
         }
 
         // Fallback: synthesize Win+Ctrl+Arrow and step closed-loop, off the UI thread so the

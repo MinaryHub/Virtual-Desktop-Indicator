@@ -34,6 +34,7 @@ public partial class SettingsWindow : Window
         AutoStartCheck.IsChecked = StartupManager.IsEnabled();
 
         MultiMonitorCheck.IsChecked = _config.ShowOnAllMonitors;
+        SmoothSwitchCheck.IsChecked = _config.SmoothSwitch;
         OpacitySlider.Value = Math.Round(Math.Clamp(_config.Opacity, 0.05, 1.0) * 100);
 
         BuildRows();
@@ -244,6 +245,7 @@ public partial class SettingsWindow : Window
                 _config.Hotkeys.Add(new HotkeyBinding { Hotkey = combos[d]!, Desktop = d });
 
         _config.ShowOnAllMonitors = MultiMonitorCheck.IsChecked == true;
+        _config.SmoothSwitch = SmoothSwitchCheck.IsChecked == true;
         _config.Opacity = Math.Clamp(OpacitySlider.Value / 100.0, 0.05, 1.0);
 
         StartupManager.SetEnabled(AutoStartCheck.IsChecked == true);

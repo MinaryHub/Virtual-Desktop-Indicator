@@ -39,6 +39,13 @@ public sealed class AppConfig
     public int PollIntervalMs { get; set; } = 300;
 
     /// <summary>
+    /// Switch desktops by synthesising the native Win+Ctrl+Arrow shortcut (animated, matches a
+    /// manual switch and does not flicker the taskbar). When false, jump instantly via the direct
+    /// COM interface — faster for far jumps but the un-animated switch makes taskbar buttons flicker.
+    /// </summary>
+    public bool SmoothSwitch { get; set; } = true;
+
+    /// <summary>
     /// Hotkey → desktop mappings. Each entry is like { "Hotkey": "Ctrl+Alt+1", "Desktop": 1 }.
     /// Desktop is 1-based. Supported modifiers: Ctrl, Alt, Shift, Win.
     /// Keys: 1-9, 0, A-Z, F1-F12.
