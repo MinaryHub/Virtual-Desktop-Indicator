@@ -10,6 +10,9 @@ installer/
 *.user
 debug.log
 
+# Per-machine auto-incrementing build counter (see StampBuildVersion target)
+build.counter
+
 # OS
 Thumbs.db
 Desktop.ini

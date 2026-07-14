@@ -34,15 +34,25 @@ public partial class App : System.Windows.Application
             _tray.BalloonTipText = string.Join("\n", failed);
             _tray.ShowBalloonTip(5000);
         }
+
+        // Check for a newer release in the background; only speak up if one exists.
+        _ = CheckForUpdatesAsync(silentIfNoUpdate: true);
+    }
+
+    private async Task CheckForUpdatesAsync(bool silentIfNoUpdate)
+    {
+        var result = await UpdateService.CheckAsync();
+        await UpdateFlow.HandleAsync(result, owner: null, silentIfNoUpdate);
     }
 
     private void SetupTray()
     {
         var menu = new Forms.ContextMenuStrip();
 
-        menu.Items.Add(new Forms.ToolStripMenuItem("가상 데스크톱 인디케이터") { Enabled = false });
+        menu.Items.Add(new Forms.ToolStripMenuItem($"가상 데스크톱 인디케이터 {AppVersion.Display}") { Enabled = false });
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("설정...", null, (_, _) => OpenSettings());
+        menu.Items.Add("업데이트 확인...", null, (_, _) => _ = CheckForUpdatesAsync(silentIfNoUpdate: false));
 
         _autoStartItem = new Forms.ToolStripMenuItem("Windows 시작 시 자동 실행")
         {
@@ -73,7 +83,7 @@ public partial class App : System.Windows.Application
         {
             Icon = BuildIcon(),
             Visible = true,
-            Text = "가상 데스크톱 인디케이터",
+            Text = $"가상 데스크톱 인디케이터 {AppVersion.Display}",
             ContextMenuStrip = menu,
         };
         _tray.DoubleClick += (_, _) => OpenSettings();

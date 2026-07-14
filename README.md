@@ -7,15 +7,18 @@ Windows 가상 데스크톱의 **현재 위치를 화면에 반투명하게 상�
 - 모든 가상 데스크톱에서 오버레이가 따라다니며 보임
 - `Ctrl+Alt+1` ~ `Ctrl+Alt+9` (기본값)로 해당 번호의 데스크톱으로 즉시 이동
 - 위치·투명도·글꼴 크기·색상·단축키를 설정 파일로 자유롭게 변경
+- **GitHub Releases 기반 업데이트 확인 및 원클릭 자동 업데이트**
+- 현재 **버전**을 트레이 메뉴·설정 창에 표시
 
 ## 다운로드
 
 최신 설치 파일은 **[Releases 페이지](https://github.com/knoxxr/Virtual-Desktop-Indicator/releases/latest)** 에서 받으세요.
-`VirtualDesktopIndicator-Setup-1.0.0.exe` 를 내려받아 실행하면 됩니다. (.NET 설치 불필요)
+`VirtualDesktopIndicator-Setup-<버전>.exe` 를 내려받아 실행하면 됩니다. (.NET 설치 불필요)
+이미 설치되어 있다면 앱이 시작 시 자동으로 새 버전을 확인합니다(아래 "업데이트" 참고).
 
 ## 설치 (권장)
 
-설치 파일: **`installer/VirtualDesktopIndicator-Setup-1.0.0.exe`**
+설치 파일: **`installer/VirtualDesktopIndicator-Setup-<버전>.exe`**
 
 더블클릭 → 마법사를 따라가면 설치됩니다.
 
@@ -53,7 +56,9 @@ Remove-Item publish-sc\*.pdb -EA SilentlyContinue
 
 작업 표시줄 우측 **VD** 아이콘을 우클릭(또는 더블클릭 → 설정 창):
 
+- 메뉴 맨 위에 현재 **버전**(`v1.0.0.x`)이 표시됩니다
 - **설정...** — 단축키 변경 및 자동 실행을 설정하는 창을 엽니다
+- **업데이트 확인...** — GitHub Releases에서 새 버전을 조회합니다(아래 "업데이트" 참고)
 - **Windows 시작 시 자동 실행** — 체크하면 로그인 시 자동 실행 (per-user, 관리자 권한 불필요)
 - **설정 파일 열기** — `config.json`을 기본 편집기로 엽니다
 - **설정 다시 읽기** — 파일을 직접 수정한 뒤 즉시 반영
@@ -65,11 +70,27 @@ Remove-Item publish-sc\*.pdb -EA SilentlyContinue
 트레이 아이콘 더블클릭 또는 **설정...** 메뉴로 엽니다.
 
 - **Windows 시작 시 자동 실행** 체크박스
-- **단축키** — 데스크톱 1~9 각각에 대해 변경 버튼을 클릭한 뒤 원하는 조합을 그대로 누르면
-  됩니다. 예: 버튼 클릭 → `Ctrl` `Alt` 를 누른 채 `3` → `Ctrl+Alt+3` 으로 지정됨.
-  - **Esc** 입력 취소 · **Delete** 해당 단축키 지우기
-  - 최소 하나의 수식어(`Ctrl`/`Alt`/`Shift`/`Win`)가 필요하며, 중복 조합은 저장 시 경고합니다
+- **단축키** — 데스크톱 1~9 각각에 대해 수식어 체크박스(`Win` `Ctrl` `Shift` `Alt`)를
+  체크하고 오른쪽 **키 콤보박스**에서 키를 고릅니다.
+  예: `Ctrl` `Alt` 체크 + 키 `3` 선택 → `Ctrl+Alt+3` 으로 지정됨.
+  - 키 콤보박스에서 `(없음)`을 고르거나 **지우기** 버튼으로 해당 단축키를 비웁니다
+  - 최소 하나의 수식어(`Ctrl`/`Alt`/`Shift`/`Win`)와 키가 함께 필요하며, 중복 조합은 저장 시 경고합니다
   - **저장**을 누르면 즉시 적용됩니다(재시작 불필요)
+- 창 하단에 현재 **버전**과 **업데이트 확인** 버튼이 있습니다
+
+## 업데이트 (버전 관리 · 자동 업데이트)
+
+- **버전 자동 부여** — 빌드할 때마다 `build.counter`가 1씩 증가하여 앱 버전이
+  `1.0.0.<빌드번호>` 형식으로 자동 스탬핑됩니다([csproj](VirtualDesktopIndicator.csproj)의
+  `StampBuildVersion` 타깃). 릴리스용으로 의미 있는 버전을 올릴 때는 csproj의
+  `<VersionPrefix>` 만 손으로 수정하면 됩니다. 설치 파일 버전도 게시된 exe에서 자동으로 읽어옵니다.
+- **업데이트 확인** — 앱 시작 시 백그라운드로 GitHub Releases의 최신 버전을 조회합니다
+  (새 버전이 없거나 네트워크 오류일 때는 조용히 넘어갑니다). 트레이 메뉴의
+  **업데이트 확인...** 또는 설정 창의 **업데이트 확인** 버튼으로 수동 조회도 가능합니다.
+- **자동 설치** — 새 버전이 있으면 알림을 띄우고, 사용자가 동의하면 최신 설치 파일
+  (`VirtualDesktopIndicator-Setup-*.exe`)을 내려받아 실행한 뒤 앱을 종료합니다.
+  설치 마법사가 기존 실행 파일을 교체합니다(설치 파일이 첨부되지 않은 릴리스라면 릴리스 페이지를 엽니다).
+- 버전 비교는 `Major.Minor.Patch` 기준이며, 로컬 빌드 번호(4번째 자리)는 무시합니다.
 
 > 자동 실행은 레지스트리 `HKCU\...\CurrentVersion\Run` 에 실행 파일 경로를 기록합니다.
 > 실행 파일을 다른 위치로 옮겼다면 자동 실행을 껐다 켜서 경로를 갱신하세요.
@@ -131,11 +152,14 @@ Remove-Item publish-sc\*.pdb -EA SilentlyContinue
 ## 구조
 
 ```
-App.xaml(.cs)                  진입점, 트레이 아이콘/메뉴
+App.xaml(.cs)                  진입점, 트레이 아이콘/메뉴, 시작 시 업데이트 확인
 OverlayWindow.xaml(.cs)        반투명·클릭통과 오버레이, 폴링·재배치·데스크톱 추적
-SettingsWindow.xaml(.cs)       단축키 변경 UI + 자동 실행 체크박스
+SettingsWindow.xaml(.cs)       단축키(수식어 체크박스+키 콤보박스) UI + 자동 실행 + 버전/업데이트
+UpdateFlow.cs                  업데이트 알림 → 동의 시 다운로드/설치/종료 공용 UI 흐름
 Services/
   AppConfig.cs                 config.json 로드/저장
+  AppVersion.cs                빌드 시 스탬핑된 앱 버전 노출
+  UpdateService.cs             GitHub Releases 최신 버전 조회 + 설치 파일 다운로드/실행
   VirtualDesktopRegistry.cs    레지스트리에서 현재 번호/개수/이름 읽기
   DesktopSwitcher.cs           목표 데스크톱으로 이동(내부 COM 우선, 실패 시 키 입력 폴백)
   VirtualDesktopInternal.cs    내부 COM(SwitchDesktop)으로 직접 전환 + vtable 검증

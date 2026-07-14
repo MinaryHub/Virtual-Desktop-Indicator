@@ -11,7 +11,14 @@
     <ApplicationIcon>app.ico</ApplicationIcon>
     <AssemblyName>VirtualDesktopIndicator</AssemblyName>
     <RootNamespace>VirtualDesktopIndicator</RootNamespace>
-    <Version>1.0.0</Version>
+
+    <!-- Release version: bump these by hand for a meaningful release.
+         The 4th (build) component is stamped automatically on every build
+         by the StampBuildVersion target below (see build.counter).
+         CI passes an explicit -p:Version=<tag> and -p:SkipVersionStamp=true
+         so release builds carry the exact tag version instead of a local counter. -->
+    <VersionPrefix>1.1.0</VersionPrefix>
+
     <!-- DPI is configured via app.manifest (WPF-primary app); silence the WinForms-specific hint. -->
     <NoWarn>WFO0003</NoWarn>
     <!-- Publish as a single self-contained exe with: dotnet publish -->
@@ -19,5 +26,41 @@
     <SelfContained>false</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
+
+  <!--
+    Auto-increment the build number on every build.
+    build.counter holds a single integer that is bumped and written back each
+    build; the app version becomes <VersionPrefix>.<counter> (e.g. 1.0.0.42).
+    Runs before GenerateAssemblyInfo so the stamped version lands in the
+    generated AssemblyInfo (FileVersion / InformationalVersion / AssemblyVersion).
+    build.counter is git-ignored, so it is a per-machine local counter.
+  -->
+  <Target Name="StampBuildVersion"
+          Condition="'$(SkipVersionStamp)' != 'true'"
+          BeforeTargets="GenerateAssemblyInfo;GetAssemblyVersion;CoreCompile">
+    <PropertyGroup>
+      <BuildCounterFile>$(MSBuildProjectDirectory)\build.counter</BuildCounterFile>
+    </PropertyGroup>
+
+    <ReadLinesFromFile File="$(BuildCounterFile)" Condition="Exists('$(BuildCounterFile)')">
+      <Output TaskParameter="Lines" PropertyName="_PrevBuildCounter" />
+    </ReadLinesFromFile>
+
+    <PropertyGroup>
+      <_PrevBuildCounter Condition="'$(_PrevBuildCounter)' == ''">0</_PrevBuildCounter>
+      <_NextBuildCounter>$([MSBuild]::Add($(_PrevBuildCounter), 1))</_NextBuildCounter>
+    </PropertyGroup>
+
+    <WriteLinesToFile File="$(BuildCounterFile)" Lines="$(_NextBuildCounter)" Overwrite="true" />
+
+    <PropertyGroup>
+      <Version>$(VersionPrefix).$(_NextBuildCounter)</Version>
+      <AssemblyVersion>$(VersionPrefix).$(_NextBuildCounter)</AssemblyVersion>
+      <FileVersion>$(VersionPrefix).$(_NextBuildCounter)</FileVersion>
+      <InformationalVersion>$(VersionPrefix).$(_NextBuildCounter)</InformationalVersion>
+    </PropertyGroup>
+
+    <Message Importance="high" Text="Stamped version $(Version)" />
+  </Target>
 
 </Project>

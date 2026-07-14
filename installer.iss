@@ -3,9 +3,14 @@
 ; Produces:    installer\VirtualDesktopIndicator-Setup-<version>.exe
 
 #define AppName "Virtual Desktop Indicator"
-#define AppVersion "1.0.0"
 #define AppPublisher "SMIC"
 #define AppExe "VirtualDesktopIndicator.exe"
+; Version comes from the published exe (stamped by the StampBuildVersion MSBuild
+; target) so the installer version always matches the app. CI overrides it with
+; the exact tag version via /DAppVersion=<x.y.z>. (Requires publish-sc\ to exist.)
+#ifndef AppVersion
+  #define AppVersion GetVersionNumbersString("publish-sc\" + AppExe)
+#endif
 
 [Setup]
 ; A fixed AppId ties upgrades and uninstall together across versions.

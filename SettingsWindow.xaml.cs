@@ -1,12 +1,10 @@
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 using VirtualDesktopIndicator.Services;
 using Button = System.Windows.Controls.Button;
-using Color = System.Windows.Media.Color;
-using SystemColors = System.Windows.SystemColors;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using CheckBox = System.Windows.Controls.CheckBox;
+using ComboBox = System.Windows.Controls.ComboBox;
+using Orientation = System.Windows.Controls.Orientation;
 
 namespace VirtualDesktopIndicator;
 
@@ -17,9 +15,14 @@ public partial class SettingsWindow : Window
     private readonly AppConfig _config;
     private readonly Action _onSaved;
 
-    private readonly Button[] _buttons = new Button[MaxDesktops + 1]; // 1-based
-    private readonly string?[] _combos = new string?[MaxDesktops + 1]; // 1-based
-    private int _capturing = 0; // desktop index currently capturing, 0 = none
+    // Per-desktop controls (1-based; index 0 unused).
+    private readonly CheckBox[] _win = new CheckBox[MaxDesktops + 1];
+    private readonly CheckBox[] _ctrl = new CheckBox[MaxDesktops + 1];
+    private readonly CheckBox[] _shift = new CheckBox[MaxDesktops + 1];
+    private readonly CheckBox[] _alt = new CheckBox[MaxDesktops + 1];
+    private readonly ComboBox[] _key = new ComboBox[MaxDesktops + 1];
+
+    private const string NoKey = "(없음)";
 
     public SettingsWindow(AppConfig config, Action onSaved)
     {
@@ -27,15 +30,22 @@ public partial class SettingsWindow : Window
         _onSaved = onSaved;
         InitializeComponent();
 
+        VersionText.Text = $"버전 {AppVersion.Display}";
         AutoStartCheck.IsChecked = StartupManager.IsEnabled();
 
-        // Seed combos from existing config
-        foreach (var b in _config.Hotkeys)
-            if (b.Desktop >= 1 && b.Desktop <= MaxDesktops)
-                _combos[b.Desktop] = b.Hotkey;
-
         BuildRows();
-        PreviewKeyDown += OnPreviewKeyDown;
+        SeedFromConfig();
+    }
+
+    /// <summary>All key tokens offered in the combobox, in a sensible order.</summary>
+    private static IEnumerable<string> KeyChoices()
+    {
+        yield return NoKey;
+        for (int i = 1; i <= 9; i++) yield return i.ToString();
+        yield return "0";
+        for (char c = 'A'; c <= 'Z'; c++) yield return c.ToString();
+        for (int i = 1; i <= 24; i++) yield return "F" + i;
+        for (int i = 0; i <= 9; i++) yield return "Num" + i;
     }
 
     private void BuildRows()
@@ -43,9 +53,11 @@ public partial class SettingsWindow : Window
         for (int d = 1; d <= MaxDesktops; d++)
         {
             var grid = new Grid { Margin = new Thickness(0, 0, 0, 6) };
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(84) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(78) });      // label
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });          // modifiers
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // spacer
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });          // key combo
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });          // clear
 
             var label = new TextBlock
             {
@@ -56,139 +68,197 @@ public partial class SettingsWindow : Window
             Grid.SetColumn(label, 0);
             grid.Children.Add(label);
 
-            var capture = new Button
+            var mods = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+            _win[d] = MakeModifierCheck("Win");
+            _ctrl[d] = MakeModifierCheck("Ctrl");
+            _shift[d] = MakeModifierCheck("Shift");
+            _alt[d] = MakeModifierCheck("Alt");
+            mods.Children.Add(_win[d]);
+            mods.Children.Add(_ctrl[d]);
+            mods.Children.Add(_shift[d]);
+            mods.Children.Add(_alt[d]);
+            Grid.SetColumn(mods, 1);
+            grid.Children.Add(mods);
+
+            var key = new ComboBox
             {
-                Height = 30,
-                Tag = d,
-                Margin = new Thickness(0, 0, 6, 0),
-                FontSize = 13,
+                Width = 74,
+                Height = 28,
+                FontSize = 12,
+                VerticalContentAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(6, 0, 6, 0),
             };
-            capture.Click += OnCaptureClick;
-            Grid.SetColumn(capture, 1);
-            grid.Children.Add(capture);
-            _buttons[d] = capture;
+            foreach (var choice in KeyChoices()) key.Items.Add(choice);
+            key.SelectedItem = NoKey;
+            _key[d] = key;
+            Grid.SetColumn(key, 3);
+            grid.Children.Add(key);
 
             var clear = new Button
             {
                 Content = "지우기",
                 Width = 62,
-                Height = 30,
+                Height = 28,
                 Tag = d,
                 FontSize = 12,
             };
             clear.Click += OnClearClick;
-            Grid.SetColumn(clear, 2);
+            Grid.SetColumn(clear, 4);
             grid.Children.Add(clear);
 
             RowsPanel.Children.Add(grid);
-            RefreshButton(d);
         }
     }
 
-    private void RefreshButton(int d)
+    private static CheckBox MakeModifierCheck(string text) => new()
     {
-        var btn = _buttons[d];
-        if (d == _capturing)
+        Content = text,
+        FontSize = 12,
+        Margin = new Thickness(0, 0, 8, 0),
+        VerticalAlignment = VerticalAlignment.Center,
+    };
+
+    /// <summary>Populate the controls from existing config hotkey strings.</summary>
+    private void SeedFromConfig()
+    {
+        foreach (var b in _config.Hotkeys)
         {
-            btn.Content = "입력 대기… (조합을 누르세요)";
-            btn.Foreground = new SolidColorBrush(Color.FromRgb(0x1A, 0x73, 0xE8));
-            btn.FontWeight = FontWeights.SemiBold;
-        }
-        else
-        {
-            btn.Content = string.IsNullOrEmpty(_combos[d]) ? "(없음)" : _combos[d];
-            btn.Foreground = string.IsNullOrEmpty(_combos[d])
-                ? new SolidColorBrush(Color.FromRgb(0x99, 0x99, 0x99))
-                : SystemColors.ControlTextBrush;
-            btn.FontWeight = FontWeights.Normal;
+            if (b.Desktop < 1 || b.Desktop > MaxDesktops) continue;
+            if (!TryParseCombo(b.Hotkey, out bool win, out bool ctrl, out bool shift, out bool alt, out string? key))
+                continue;
+
+            int d = b.Desktop;
+            _win[d].IsChecked = win;
+            _ctrl[d].IsChecked = ctrl;
+            _shift[d].IsChecked = shift;
+            _alt[d].IsChecked = alt;
+            _key[d].SelectedItem = key != null && _key[d].Items.Contains(key) ? key : NoKey;
         }
     }
 
-    private void OnCaptureClick(object sender, RoutedEventArgs e)
+    /// <summary>Parses "Ctrl+Alt+1" into modifier flags + key token.</summary>
+    private static bool TryParseCombo(string? text, out bool win, out bool ctrl, out bool shift, out bool alt, out string? key)
     {
-        int prev = _capturing;
-        _capturing = (int)((Button)sender).Tag!;
-        if (prev != 0 && prev != _capturing) RefreshButton(prev);
-        HideStatus();
-        RefreshButton(_capturing);
+        win = ctrl = shift = alt = false;
+        key = null;
+        if (string.IsNullOrWhiteSpace(text)) return false;
+
+        foreach (var raw in text.Split('+', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            switch (raw.ToLowerInvariant())
+            {
+                case "ctrl": case "control": ctrl = true; break;
+                case "alt": alt = true; break;
+                case "shift": shift = true; break;
+                case "win": case "windows": case "meta": win = true; break;
+                default: key = NormalizeKeyToken(raw); break; // last non-modifier wins
+            }
+        }
+        return key != null;
+    }
+
+    /// <summary>Maps a parsed token to the exact combobox item spelling (e.g. "a" → "A", "f5" → "F5").</summary>
+    private static string? NormalizeKeyToken(string token)
+    {
+        token = token.Trim();
+        if (token.Length == 1 && char.IsLetter(token[0])) return char.ToUpperInvariant(token[0]).ToString();
+        if (token.Length == 1 && char.IsDigit(token[0])) return token;
+        if (token.StartsWith("num", StringComparison.OrdinalIgnoreCase) && token.Length == 4 && char.IsDigit(token[3]))
+            return "Num" + token[3];
+        if ((token[0] is 'F' or 'f') && int.TryParse(token.AsSpan(1), out int fn) && fn is >= 1 and <= 24)
+            return "F" + fn;
+        return null;
     }
 
     private void OnClearClick(object sender, RoutedEventArgs e)
     {
         int d = (int)((Button)sender).Tag!;
-        _combos[d] = null;
-        if (_capturing == d) _capturing = 0;
-        RefreshButton(d);
+        _win[d].IsChecked = _ctrl[d].IsChecked = _shift[d].IsChecked = _alt[d].IsChecked = false;
+        _key[d].SelectedItem = NoKey;
+        HideStatus();
     }
 
-    private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+    /// <summary>Builds a combo string like "Ctrl+Alt+1" from the row's controls, or null if the row is empty.</summary>
+    private string? BuildCombo(int d, out bool invalid)
     {
-        if (_capturing == 0) return;
-
-        e.Handled = true; // don't let keys activate buttons while capturing
-        Key key = e.Key == Key.System ? e.SystemKey : e.Key;
-
-        if (key == Key.Escape) { int d = _capturing; _capturing = 0; RefreshButton(d); return; }
-        if (key is Key.Delete or Key.Back)
-        {
-            int d = _capturing; _combos[d] = null; _capturing = 0; RefreshButton(d); return;
-        }
-
-        if (IsModifierKey(key)) return; // wait for the real key
-
-        var mods = Keyboard.Modifiers;
-        // WPF's Keyboard.Modifiers never reports the Windows key (the OS swallows it),
-        // so detect it directly from the physical key state.
-        bool win = IsWinDown();
-
-        if (mods == ModifierKeys.None && !win)
-        {
-            ShowStatus("최소 하나의 수식어(Ctrl · Alt · Shift · Win)를 포함해야 합니다.");
-            return;
-        }
-
-        string? token = KeyToToken(key);
-        if (token == null)
-        {
-            ShowStatus("지원하지 않는 키입니다. 숫자·문자·F1~F24·넘패드 숫자만 사용할 수 있습니다.");
-            return;
-        }
+        invalid = false;
+        string keyToken = _key[d].SelectedItem as string ?? NoKey;
+        bool hasKey = keyToken != NoKey;
 
         var parts = new List<string>();
-        if (mods.HasFlag(ModifierKeys.Control)) parts.Add("Ctrl");
-        if (mods.HasFlag(ModifierKeys.Alt)) parts.Add("Alt");
-        if (mods.HasFlag(ModifierKeys.Shift)) parts.Add("Shift");
-        if (win) parts.Add("Win");
-        parts.Add(token);
+        if (_ctrl[d].IsChecked == true) parts.Add("Ctrl");
+        if (_alt[d].IsChecked == true) parts.Add("Alt");
+        if (_shift[d].IsChecked == true) parts.Add("Shift");
+        if (_win[d].IsChecked == true) parts.Add("Win");
+        bool hasMod = parts.Count > 0;
 
-        int cd = _capturing;
-        _combos[cd] = string.Join("+", parts);
-        _capturing = 0;
-        HideStatus();
-        RefreshButton(cd);
+        if (!hasKey && !hasMod) return null; // empty row → no binding
+
+        if (!hasKey || !hasMod)
+        {
+            invalid = true;
+            return null;
+        }
+
+        parts.Add(keyToken);
+        return string.Join("+", parts);
     }
 
-    private static bool IsModifierKey(Key k) => k is
-        Key.LeftCtrl or Key.RightCtrl or Key.LeftAlt or Key.RightAlt or
-        Key.LeftShift or Key.RightShift or Key.LWin or Key.RWin or
-        Key.System or Key.None;
-
-    private static string? KeyToToken(Key key)
+    private void OnSave(object sender, RoutedEventArgs e)
     {
-        if (key is >= Key.D0 and <= Key.D9) return ((int)(key - Key.D0)).ToString();
-        // Numpad kept distinct ("Num1") so it registers on the numpad key, not the top row.
-        if (key is >= Key.NumPad0 and <= Key.NumPad9) return "Num" + (int)(key - Key.NumPad0);
-        if (key is >= Key.A and <= Key.Z) return key.ToString();
-        if (key is >= Key.F1 and <= Key.F24) return "F" + (int)(key - Key.F1 + 1);
-        return null;
+        var combos = new string?[MaxDesktops + 1];
+        for (int d = 1; d <= MaxDesktops; d++)
+        {
+            combos[d] = BuildCombo(d, out bool invalid);
+            if (invalid)
+            {
+                ShowStatus($"데스크톱 {d}: 수식어(Ctrl·Alt·Shift·Win) 하나 이상과 키를 함께 지정해야 합니다.");
+                return;
+            }
+        }
+
+        // Warn on duplicate combos (only the first would register successfully).
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        for (int d = 1; d <= MaxDesktops; d++)
+        {
+            var c = combos[d];
+            if (!string.IsNullOrEmpty(c) && !seen.Add(c))
+            {
+                ShowStatus($"단축키 '{c}' 가 중복되었습니다. 서로 다른 조합을 지정하세요.");
+                return;
+            }
+        }
+
+        _config.Hotkeys = new List<HotkeyBinding>();
+        for (int d = 1; d <= MaxDesktops; d++)
+            if (!string.IsNullOrEmpty(combos[d]))
+                _config.Hotkeys.Add(new HotkeyBinding { Hotkey = combos[d]!, Desktop = d });
+
+        StartupManager.SetEnabled(AutoStartCheck.IsChecked == true);
+
+        _config.Save();
+        _onSaved();
+        Close();
     }
 
-    [System.Runtime.InteropServices.DllImport("user32.dll")]
-    private static extern short GetAsyncKeyState(int vKey);
+    private async void OnCheckUpdate(object sender, RoutedEventArgs e)
+    {
+        UpdateButton.IsEnabled = false;
+        var prevContent = UpdateButton.Content;
+        UpdateButton.Content = "확인 중…";
+        try
+        {
+            var result = await UpdateService.CheckAsync();
+            await UpdateFlow.HandleAsync(result, this, silentIfNoUpdate: false);
+        }
+        finally
+        {
+            UpdateButton.Content = prevContent;
+            UpdateButton.IsEnabled = true;
+        }
+    }
 
-    private static bool IsWinDown() =>
-        (GetAsyncKeyState(0x5B) & 0x8000) != 0 || // VK_LWIN
-        (GetAsyncKeyState(0x5C) & 0x8000) != 0;   // VK_RWIN
+    private void OnCancel(object sender, RoutedEventArgs e) => Close();
 
     private void ShowStatus(string msg)
     {
@@ -200,32 +270,4 @@ public partial class SettingsWindow : Window
     {
         StatusText.Visibility = Visibility.Collapsed;
     }
-
-    private void OnSave(object sender, RoutedEventArgs e)
-    {
-        // Warn on duplicate combos (only the first would register successfully).
-        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        for (int d = 1; d <= MaxDesktops; d++)
-        {
-            var c = _combos[d];
-            if (!string.IsNullOrEmpty(c) && !seen.Add(c))
-            {
-                ShowStatus($"단축키 '{c}' 가 중복되었습니다. 서로 다른 조합을 지정하세요.");
-                return;
-            }
-        }
-
-        _config.Hotkeys = new List<HotkeyBinding>();
-        for (int d = 1; d <= MaxDesktops; d++)
-            if (!string.IsNullOrEmpty(_combos[d]))
-                _config.Hotkeys.Add(new HotkeyBinding { Hotkey = _combos[d]!, Desktop = d });
-
-        StartupManager.SetEnabled(AutoStartCheck.IsChecked == true);
-
-        _config.Save();
-        _onSaved();
-        Close();
-    }
-
-    private void OnCancel(object sender, RoutedEventArgs e) => Close();
 }
