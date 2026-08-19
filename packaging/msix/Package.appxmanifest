@@ -39,9 +39,11 @@
     <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
   </Dependencies>
 
+  <!-- The app UI is English-only (no localized resources / resources.pri ships in the
+       package), so declare just en-us. Declaring a language the package has no resources
+       for makes the Store list a language the app does not actually offer. -->
   <Resources>
     <Resource Language="en-us" />
-    <Resource Language="ko-kr" />
   </Resources>
 
   <Applications>

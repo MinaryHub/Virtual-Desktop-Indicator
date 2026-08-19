@@ -1,11 +1,11 @@
 # Builds the MSIX package locally (for testing before Store submission).
-# Usage from repo root:   pwsh packaging/msix/build-msix.ps1 -Version 1.3.2
+# Usage from repo root:   pwsh packaging/msix/build-msix.ps1 -Version 1.3.3
 #
 # The Store re-signs the package on submission, so signing is NOT required to submit. To
 # SIDELOAD-test the .msix on this machine you must sign it with a certificate whose subject
 # matches Identity/@Publisher and trust that cert — see the notes printed at the end.
 param(
-    [string]$Version = "1.3.2"
+    [string]$Version = "1.3.3"
 )
 $ErrorActionPreference = 'Stop'
 $root = Resolve-Path (Join-Path $PSScriptRoot '..\..')
@@ -16,8 +16,11 @@ try {
     Remove-Item $stage, $pub -Recurse -Force -ErrorAction SilentlyContinue
 
     Write-Host "Publishing $Version ..." -ForegroundColor Cyan
+    # Plain folder layout (NOT single-file): the MSIX is already the container, and an
+    # unbundled layout starts faster and gives the Store's certification tooling real files
+    # to inspect instead of one opaque bundle.
     dotnet publish -c Release -r win-x64 --self-contained true `
-        -p:PublishSingleFile=true -p:SkipVersionStamp=true `
+        -p:PublishSingleFile=false -p:SkipVersionStamp=true `
         -p:Version=$Version -p:AssemblyVersion=$Version `
         -p:FileVersion=$Version -p:InformationalVersion=$Version `
         -o $pub
@@ -30,10 +33,12 @@ try {
     Copy-Item (Join-Path $PSScriptRoot 'Assets') (Join-Path $stage 'Assets') -Recurse -Force
     $manifest = Join-Path $stage 'AppxManifest.xml'
     Copy-Item (Join-Path $PSScriptRoot 'Package.appxmanifest') $manifest -Force
-    # -creplace (case-SENSITIVE): only the Identity's capital-V Version="..." must change, NOT
-    # the lowercase version="1.0" in the <?xml ...?> declaration. UTF-8 without a BOM: MakeAppx
-    # rejects both a UTF-16 body (PowerShell's default) and, on some SDK versions, a UTF-8 BOM.
-    $stamped = (Get-Content $manifest -Raw) -creplace 'Version="[0-9.]+"', "Version=""$Version.0"""
+    # Anchored to the <Identity> element on purpose: a bare Version="[0-9.]+" also matches the
+    # tail of MinVersion="10.0.19041.0" in TargetDeviceFamily and would rewrite the minimum OS
+    # version to the app version. -creplace is case-SENSITIVE so the lowercase version="1.0" in
+    # the <?xml ...?> declaration is left alone. UTF-8 without a BOM: MakeAppx rejects both a
+    # UTF-16 body (PowerShell's default) and, on some SDK versions, a UTF-8 BOM.
+    $stamped = (Get-Content $manifest -Raw) -creplace '(<Identity[^>]*?Version=")[0-9.]+(")', "`${1}$Version.0`$2"
     [System.IO.File]::WriteAllText($manifest, $stamped, (New-Object System.Text.UTF8Encoding($false)))
 
     if (Select-String -Path $manifest -Pattern 'PLACEHOLDER' -Quiet) {

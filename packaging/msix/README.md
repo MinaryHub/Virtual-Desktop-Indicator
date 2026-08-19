@@ -21,7 +21,8 @@ binaries** ship through both the Store and the Inno Setup installer:
 - `Assets/` — logo PNGs (committed; regenerate with `generate-assets.ps1`).
 - `generate-assets.ps1` — renders the "VD" tile at every required size.
 - `build-msix.ps1` — builds the `.msix` locally for testing.
-- `../../.github/workflows/msix.yml` — CI: builds the `.msix` as a downloadable artifact.
+- `../../.github/workflows/msix.yml` — CI: builds the `.msix` as a downloadable artifact, on
+  every `v*` tag and on manual dispatch.
 
 ## ⚠️ Before your first submission — fill in three identity values
 
@@ -39,13 +40,18 @@ You do **not** need a code-signing certificate: the Store re-signs the package o
 
 ## Build the package
 
-**In CI (recommended):** Actions tab ▸ *Build MSIX (Store)* ▸ *Run workflow* ▸ enter the version
-(e.g. `1.3.2`). Download the `.msix` from the run's artifacts.
+**In CI (recommended):** every `v*` release tag builds the package automatically (version taken
+from the tag) — grab the `.msix` from that run's artifacts. For a Store-only rebuild, use the
+Actions tab ▸ *Build MSIX (Store)* ▸ *Run workflow* ▸ enter the version (e.g. `1.3.3`).
 
 **Locally:**
 ```powershell
-pwsh packaging/msix/build-msix.ps1 -Version 1.3.2
+pwsh packaging/msix/build-msix.ps1 -Version 1.3.3
 ```
+
+The MSIX payload is published **self-contained but not single-file** (`-p:PublishSingleFile=false`,
+unlike the Inno Setup build): the package is already the container, so an unbundled layout starts
+faster and gives Store certification real files to inspect instead of one opaque bundle.
 
 ## Submit to the Store
 

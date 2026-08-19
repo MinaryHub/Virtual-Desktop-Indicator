@@ -92,6 +92,9 @@ The wizard configuration lives in [installer.iss](installer.iss) (version, short
 > [release workflow](.github/workflows/release.yml), which publishes the
 > self-contained build, compiles the Inno Setup installer, and creates a
 > GitHub Release with the installer attached — no local Inno Setup needed.
+> The same tag also runs the [MSIX workflow](.github/workflows/msix.yml), which builds the
+> Microsoft Store package as a workflow artifact — see
+> [packaging/msix](packaging/msix/README.md) for submitting it.
 
 ## Tray menu
 

@@ -1,18 +1,24 @@
 name: Build MSIX (Store)
 
-# Builds the Microsoft Store MSIX package. Run manually from the Actions tab and give it a
-# version (e.g. 1.3.2). The resulting .msix is uploaded as a workflow artifact — download it
+# Builds the Microsoft Store MSIX package. Runs on every v* tag (version taken from the tag),
+# or manually from the Actions tab with an explicit version (e.g. 1.3.3). The resulting .msix
+# is uploaded as a workflow artifact — download it
 # and upload it to Partner Center. The Store re-signs the package, so no certificate is needed
 # here. (Requires the three Partner Center identity placeholders in
 # packaging/msix/Package.appxmanifest to be filled in first, or the package won't match your
 # reserved Store identity.)
 on:
+  # Cutting a release builds the Store package too, so the .msix and the GitHub installer
+  # always come from the same commit. Still runnable by hand for a Store-only rebuild.
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       version:
         description: 'Package version (x.y.z — revision .0 is appended automatically)'
         required: true
-        default: '1.3.2'
+        default: '1.3.3'
 
 permissions:
   contents: read
@@ -29,12 +35,24 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
+      - name: Resolve version
+        id: ver
+        shell: pwsh
+        run: |
+          $v = "${{ github.event.inputs.version }}"
+          if (-not $v) { $v = "${{ github.ref_name }}".TrimStart('v') }
+          if ($v -notmatch '^\d+\.\d+\.\d+$') { throw "Version must be x.y.z, got '$v'" }
+          "version=$v" >> $env:GITHUB_OUTPUT
+          Write-Host "Package version: $v"
+
       - name: Publish (self-contained, win-x64)
         shell: pwsh
         run: |
-          $ver = "${{ github.event.inputs.version }}"
+          $ver = "${{ steps.ver.outputs.version }}"
+          # Plain folder layout (NOT single-file): the MSIX is already the container, and an
+          # unbundled layout starts faster and gives Store certification real files to inspect.
           dotnet publish -c Release -r win-x64 --self-contained true `
-            -p:PublishSingleFile=true `
+            -p:PublishSingleFile=false `
             -p:SkipVersionStamp=true `
             -p:Version=$ver `
             -p:AssemblyVersion=$ver `
@@ -46,7 +64,7 @@ jobs:
       - name: Stage package layout
         shell: pwsh
         run: |
-          $ver = "${{ github.event.inputs.version }}"
+          $ver = "${{ steps.ver.outputs.version }}"
           $stage = "msix-stage"
           New-Item -ItemType Directory -Force -Path $stage | Out-Null
           # App payload
@@ -56,9 +74,11 @@ jobs:
           Copy-Item packaging\msix\Package.appxmanifest $stage\AppxManifest.xml -Force
           # Stamp the 4-part version (revision must be 0 for the Store)
           $manifest = "$stage\AppxManifest.xml"
-          # -creplace (case-SENSITIVE): change only the Identity's capital-V Version, not the
-          # lowercase version="1.0" in the <?xml?> declaration. Write UTF-8 without a BOM.
-          $stamped = (Get-Content $manifest -Raw) -creplace 'Version="[0-9.]+"', "Version=""$ver.0"""
+          # Anchored to <Identity> on purpose: a bare Version="[0-9.]+" also matches the tail of
+          # MinVersion="10.0.19041.0" in TargetDeviceFamily and would rewrite the minimum OS
+          # version to the app version. -creplace is case-SENSITIVE, so the lowercase
+          # version="1.0" in the <?xml?> declaration is left alone. Write UTF-8 without a BOM.
+          $stamped = (Get-Content $manifest -Raw) -creplace '(<Identity[^>]*?Version=")[0-9.]+(")', "`${1}$ver.0`$2"
           [System.IO.File]::WriteAllText($manifest, $stamped, (New-Object System.Text.UTF8Encoding($false)))
           Write-Host "Staged version $ver.0"
           if (Select-String -Path $manifest -Pattern 'PLACEHOLDER' -Quiet) {
@@ -78,7 +98,7 @@ jobs:
       - name: Pack MSIX
         shell: pwsh
         run: |
-          $ver = "${{ github.event.inputs.version }}"
+          $ver = "${{ steps.ver.outputs.version }}"
           $out = "VirtualDesktopIndicator-$ver.msix"
           & "${{ steps.sdk.outputs.path }}" pack /d msix-stage /p $out /o
           Write-Host "Built $out"
@@ -86,6 +106,6 @@ jobs:
       - name: Upload MSIX artifact
         uses: actions/upload-artifact@v4
         with:
-          name: VirtualDesktopIndicator-msix-${{ github.event.inputs.version }}
+          name: VirtualDesktopIndicator-msix-${{ steps.ver.outputs.version }}
           path: VirtualDesktopIndicator-*.msix
           if-no-files-found: error
