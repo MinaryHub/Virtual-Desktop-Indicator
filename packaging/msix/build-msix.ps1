@@ -1,11 +1,11 @@
 # Builds the MSIX package locally (for testing before Store submission).
-# Usage from repo root:   pwsh packaging/msix/build-msix.ps1 -Version 1.3.7
+# Usage from repo root:   pwsh packaging/msix/build-msix.ps1 -Version 1.3.8
 #
 # The Store re-signs the package on submission, so signing is NOT required to submit. To
 # SIDELOAD-test the .msix on this machine you must sign it with a certificate whose subject
 # matches Identity/@Publisher and trust that cert — see the notes printed at the end.
 param(
-    [string]$Version = "1.3.7",
+    [string]$Version = "1.3.8",
     # Local sideload testing only. Store submission fails on PLACEHOLDER identity values,
     # so packing refuses to produce one unless you ask for it explicitly.
     [switch]$AllowPlaceholders
@@ -79,7 +79,7 @@ Next steps:
   • Local sideload test: sign it first, e.g.
       `$cert = New-SelfSignedCertificate -Type Custom -Subject "<same as Identity/@Publisher>" ``
                  -KeyUsage DigitalSignature -CertStoreLocation Cert:\CurrentUser\My ``
-                 -TextExtension @("2.5.29.37={text}1.3.7.1.5.5.7.3.3","2.5.29.19={text}")
+                 -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3","2.5.29.19={text}")
       signtool sign /fd SHA256 /a /f <exported.pfx> /p <pw> "$out"
     then trust the cert in LocalMachine\TrustedPeople and: Add-AppxPackage "$out"
 "@ -ForegroundColor DarkGray

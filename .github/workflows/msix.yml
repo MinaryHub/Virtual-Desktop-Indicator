@@ -21,7 +21,7 @@ on:
       version:
         description: 'Package version (x.y.z — revision .0 is appended automatically)'
         required: true
-        default: '1.3.7'
+        default: '1.3.8'
 
 permissions:
   contents: write   # attaching the .msix to the release on tag builds

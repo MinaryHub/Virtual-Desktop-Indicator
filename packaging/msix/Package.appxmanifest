@@ -7,10 +7,12 @@
   plain-exe build. The only packaged-specific behaviour lives behind PackageContext:
   self-update is disabled and "run at startup" uses the windows.startupTask below.
 
-  Identity below matches Partner Center ▸ Product ▸ Product identity. Publisher and
-  PublisherDisplayName are account-wide (the same values ship in kr.minary.kerminal);
-  Identity/@Name is reserved per product. The Store rejects the upload if any of them
-  differs, so change them only against that page.
+  Identity below matches Partner Center ▸ Product ▸ Product identity. Publisher is the
+  account's publisher GUID and PublisherDisplayName the account name — both account-wide,
+  the same in every product; Identity/@Name is reserved per product, and
+  Properties/DisplayName must be one of that product's reserved names. The Store rejects
+  the upload naming the exact expected value if any of them differs, so change them only
+  against that page (do NOT paste values from another product).
   build-msix.ps1 refuses to pack if a PLACEHOLDER ever reappears (-AllowPlaceholders
   overrides it for local sideload testing only).
   The Store re-signs the package on ingestion, so no code-signing certificate is needed
@@ -24,8 +26,8 @@
   IgnorableNamespaces="uap uap5 rescap">
 
   <Identity
-    Name="kr.minary.deskcue"
-    Publisher="CN=Minary"
+    Name="minary.DeskCue"
+    Publisher="CN=C460CD23-2642-4BA2-A332-6F8ADBE54E1F"
     Version="1.0.0.0"
     ProcessorArchitecture="x64" />
 
