@@ -1,11 +1,14 @@
 # Builds the MSIX package locally (for testing before Store submission).
-# Usage from repo root:   pwsh packaging/msix/build-msix.ps1 -Version 1.3.6
+# Usage from repo root:   pwsh packaging/msix/build-msix.ps1 -Version 1.3.7
 #
 # The Store re-signs the package on submission, so signing is NOT required to submit. To
 # SIDELOAD-test the .msix on this machine you must sign it with a certificate whose subject
 # matches Identity/@Publisher and trust that cert — see the notes printed at the end.
 param(
-    [string]$Version = "1.3.6"
+    [string]$Version = "1.3.7",
+    # Local sideload testing only. Store submission fails on PLACEHOLDER identity values,
+    # so packing refuses to produce one unless you ask for it explicitly.
+    [switch]$AllowPlaceholders
 )
 $ErrorActionPreference = 'Stop'
 $root = Resolve-Path (Join-Path $PSScriptRoot '..\..')
@@ -41,15 +44,29 @@ try {
     $stamped = (Get-Content $manifest -Raw) -creplace '(<Identity[^>]*?Version=")[0-9.]+(")', "`${1}$Version.0`$2"
     [System.IO.File]::WriteAllText($manifest, $stamped, (New-Object System.Text.UTF8Encoding($false)))
 
-    if (Select-String -Path $manifest -Pattern 'PLACEHOLDER' -Quiet) {
-        Write-Warning "AppxManifest still has PLACEHOLDER identity values — fill in the Partner Center values before submitting to the Store."
+    # 실제 식별자 값만 본다. 파일 상단 주석에도 PLACEHOLDER 라는 낱말이 있어 그대로 찾으면 잡음이 섞인다.
+    $placeholders = Select-String -Path $manifest -Pattern '(Name|Publisher)="[^"]*PLACEHOLDER|<PublisherDisplayName>\s*PLACEHOLDER'
+    if ($placeholders) {
+        # A warning was not enough: a package with PLACEHOLDER identity was submitted and
+        # rejected ("PublisherDisplayName ... doesn't match your publisher display name").
+        $lines = ($placeholders | ForEach-Object { "    line $($_.LineNumber): $($_.Line.Trim())" }) -join "`n"
+        if (-not $AllowPlaceholders) {
+            throw @"
+AppxManifest still has PLACEHOLDER identity values, so this package would be rejected by the Store:
+$lines
+Fill them in from Partner Center > Product > Product identity, or pass -AllowPlaceholders to
+build an unsubmittable package for local sideload testing.
+"@
+        }
+        Write-Warning "Packing with PLACEHOLDER identity values (-AllowPlaceholders). Do NOT submit this package."
     }
 
     $makeappx = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\makeappx.exe" -ErrorAction SilentlyContinue |
         Sort-Object FullName -Descending | Select-Object -First 1
     if (-not $makeappx) { throw "makeappx.exe not found. Install the Windows 10/11 SDK." }
 
-    $out = Join-Path $root "DeskCue-$Version.msix"
+    $suffix = if ($placeholders) { '-PLACEHOLDER-do-not-submit' } else { '' }
+    $out = Join-Path $root "DeskCue-$Version$suffix.msix"
     Write-Host "Packing $out ..." -ForegroundColor Cyan
     & $makeappx.FullName pack /d $stage /p $out /o
     if ($LASTEXITCODE -ne 0) { throw "makeappx pack failed" }
@@ -62,7 +79,7 @@ Next steps:
   • Local sideload test: sign it first, e.g.
       `$cert = New-SelfSignedCertificate -Type Custom -Subject "<same as Identity/@Publisher>" ``
                  -KeyUsage DigitalSignature -CertStoreLocation Cert:\CurrentUser\My ``
-                 -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3","2.5.29.19={text}")
+                 -TextExtension @("2.5.29.37={text}1.3.7.1.5.5.7.3.3","2.5.29.19={text}")
       signtool sign /fd SHA256 /a /f <exported.pfx> /p <pw> "$out"
     then trust the cert in LocalMachine\TrustedPeople and: Add-AppxPackage "$out"
 "@ -ForegroundColor DarkGray

@@ -13,7 +13,7 @@ desktop with custom hotkeys**.
 
 ## Download
 
-Get the latest build from the **[Releases page](https://github.com/knoxxr/Virtual-Desktop-Indicator/releases/latest)** (no .NET install required):
+Get the latest build from the **[Releases page](https://github.com/MinaryHub/Virtual-Desktop-Indicator/releases/latest)** (no .NET install required):
 
 - **Windows**: `DeskCue-Setup-<version>.exe` — download and run it.
 - **Linux (X11)**: `DeskCue-linux-x64-<version>.tar.gz` — extract and run `./install.sh` (see [Linux (X11)](#linux-x11) below).

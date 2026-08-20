@@ -19,7 +19,7 @@ public sealed record UpdateCheckResult(
 /// </summary>
 public static class UpdateService
 {
-    private const string Owner = "knoxxr";
+    private const string Owner = "MinaryHub";
     private const string Repo = "Virtual-Desktop-Indicator";
     private static readonly string LatestApi =
         $"https://api.github.com/repos/{Owner}/{Repo}/releases/latest";

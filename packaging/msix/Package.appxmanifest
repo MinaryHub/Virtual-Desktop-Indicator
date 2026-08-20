@@ -7,12 +7,12 @@
   plain-exe build. The only packaged-specific behaviour lives behind PackageContext:
   self-update is disabled and "run at startup" uses the windows.startupTask below.
 
-  ►► THREE VALUES BELOW ARE PARTNER-CENTER PLACEHOLDERS — replace before submitting.
-     They read "PLACEHOLDER" so the package still builds locally for testing; the build
-     scripts warn while any remain. Copy the exact values from:
-     Identity/@Name              → Partner Center ▸ Product ▸ Product identity ▸ "Package/Identity/Name"
-     Identity/@Publisher         → same page ▸ "Package/Identity/Publisher"
-     Properties/PublisherDisplayName → same page ▸ "Package/Properties/PublisherDisplayName"
+  Identity below matches Partner Center ▸ Product ▸ Product identity. Publisher and
+  PublisherDisplayName are account-wide (the same values ship in kr.minary.kerminal);
+  Identity/@Name is reserved per product. The Store rejects the upload if any of them
+  differs, so change them only against that page.
+  build-msix.ps1 refuses to pack if a PLACEHOLDER ever reappears (-AllowPlaceholders
+  overrides it for local sideload testing only).
   The Store re-signs the package on ingestion, so no code-signing certificate is needed
   for Store distribution. Identity/@Version must be 4-part with revision 0 (CI stamps it).
 -->
@@ -24,14 +24,14 @@
   IgnorableNamespaces="uap uap5 rescap">
 
   <Identity
-    Name="VirtualDesktopIndicator.PLACEHOLDER"
-    Publisher="CN=PLACEHOLDER"
+    Name="kr.minary.deskcue"
+    Publisher="CN=Minary"
     Version="1.0.0.0"
     ProcessorArchitecture="x64" />
 
   <Properties>
     <DisplayName>DeskCue</DisplayName>
-    <PublisherDisplayName>PLACEHOLDER</PublisherDisplayName>
+    <PublisherDisplayName>minary</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
