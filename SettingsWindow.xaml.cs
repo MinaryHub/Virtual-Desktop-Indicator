@@ -30,7 +30,12 @@ public partial class SettingsWindow : Window
         _onSaved = onSaved;
         InitializeComponent();
 
-        VersionText.Text = $"Version {AppVersion.Display}";
+        // Nine hotkey rows make the window taller than a small or scaled (high-DPI) screen.
+        // Cap it to the work area so the action bar stays reachable and the settings area
+        // scrolls instead of the Save button falling off the bottom.
+        MaxHeight = Math.Max(480, SystemParameters.WorkArea.Height - 40);
+
+        VersionText.Text = AppVersion.Display;
         AutoStartCheck.IsChecked = StartupManager.IsEnabled();
 
         // The Store build updates through the Store, so drop the manual GitHub update check.
@@ -258,6 +263,8 @@ public partial class SettingsWindow : Window
         _onSaved();
         Close();
     }
+
+    private void OnDonate(object sender, RoutedEventArgs e) => Donate.Open();
 
     private async void OnCheckUpdate(object sender, RoutedEventArgs e)
     {

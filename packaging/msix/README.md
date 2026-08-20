@@ -42,11 +42,11 @@ You do **not** need a code-signing certificate: the Store re-signs the package o
 
 **In CI (recommended):** every `v*` release tag builds the package automatically (version taken
 from the tag) — grab the `.msix` from that run's artifacts. For a Store-only rebuild, use the
-Actions tab ▸ *Build MSIX (Store)* ▸ *Run workflow* ▸ enter the version (e.g. `1.3.3`).
+Actions tab ▸ *Build MSIX (Store)* ▸ *Run workflow* ▸ enter the version (e.g. `1.3.4`).
 
 **Locally:**
 ```powershell
-pwsh packaging/msix/build-msix.ps1 -Version 1.3.3
+pwsh packaging/msix/build-msix.ps1 -Version 1.3.4
 ```
 
 The MSIX payload is published **self-contained but not single-file** (`-p:PublishSingleFile=false`,

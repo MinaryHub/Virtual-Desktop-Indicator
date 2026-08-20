@@ -83,6 +83,11 @@ public partial class App : System.Windows.Application
             posMenu.DropDownItems.Add(item, null, (_, _) => SetPosition(item));
         }
         menu.Items.Add(posMenu);
+
+        // Plain outbound link (no payment UI), so it ships in the Store build as well.
+        menu.Items.Add(new Forms.ToolStripSeparator());
+        menu.Items.Add("Support development \u2665", null, (_, _) => Donate.Open());
+
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("Exit", null, (_, _) => ExitApp());
 

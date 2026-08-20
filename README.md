@@ -107,6 +107,8 @@ Right-click the **VD** icon in the notification area (or double-click → settin
 - **Open config file** — opens `config.json` in the default editor
 - **Reload config** — apply changes made by editing the file directly
 - **Position** — quickly change the overlay position (TopCenter, TopRight, etc.)
+- **Support development ♥** — opens the [GitHub Sponsors page](https://github.com/sponsors/MinaryHub)
+  in your browser (see "Support" below)
 - **Exit**
 
 ## Settings window (changing hotkeys)
@@ -201,6 +203,15 @@ builds, so they break easily. This app uses **only approaches that survive build
 - **Showing on every desktop**: moves the overlay to the current desktop via the documented
   public COM interface `IVirtualDesktopManager.MoveWindowToDesktop` (stable since Windows 10 1607).
 
+## Support
+
+The app is free and has no ads, no telemetry, and no paid tier. If it saves you time, you can
+chip in on **[GitHub Sponsors](https://github.com/sponsors/MinaryHub)** — reachable from the tray
+menu (*Support development ♥*) and from the settings window (*♥ Support*).
+
+Both entries are plain links that open your browser; the app itself never handles payments,
+asks for an account, or shows a payment screen, in either the GitHub build or the Store build.
+
 ## Structure
 
 ```
@@ -218,6 +229,7 @@ Services/
   VirtualDesktopManagerCom.cs  Public COM (MoveWindowToDesktop) wrapper
   HotKeyManager.cs             Registers/handles global hotkeys
   StartupManager.cs            Toggles run-at-startup (HKCU\Run)
+  Donate.cs                    Opens the GitHub Sponsors page in the browser
 
 linux/                         Linux/X11 build (Avalonia UI) — overlay, tray,
                                settings, EWMH desktop detection/switching,

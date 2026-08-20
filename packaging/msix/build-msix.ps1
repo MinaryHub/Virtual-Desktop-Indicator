@@ -1,11 +1,11 @@
 # Builds the MSIX package locally (for testing before Store submission).
-# Usage from repo root:   pwsh packaging/msix/build-msix.ps1 -Version 1.3.3
+# Usage from repo root:   pwsh packaging/msix/build-msix.ps1 -Version 1.3.4
 #
 # The Store re-signs the package on submission, so signing is NOT required to submit. To
 # SIDELOAD-test the .msix on this machine you must sign it with a certificate whose subject
 # matches Identity/@Publisher and trust that cert — see the notes printed at the end.
 param(
-    [string]$Version = "1.3.3"
+    [string]$Version = "1.3.4"
 )
 $ErrorActionPreference = 'Stop'
 $root = Resolve-Path (Join-Path $PSScriptRoot '..\..')
