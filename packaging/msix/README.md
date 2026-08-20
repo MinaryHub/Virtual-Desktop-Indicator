@@ -1,6 +1,6 @@
 # Microsoft Store (MSIX) packaging
 
-This folder packages Virtual Desktop Indicator as an **MSIX** for the Microsoft Store. The app
+This folder packages DeskCue as an **MSIX** for the Microsoft Store. The app
 is packaged as a **full-trust Win32 desktop app** (`EntryPoint=Windows.FullTrustApplication`),
 so `SendInput` key synthesis, global hotkeys, and the virtual-desktop registry reads all keep
 working exactly as in the plain-exe build.
@@ -42,11 +42,11 @@ You do **not** need a code-signing certificate: the Store re-signs the package o
 
 **In CI (recommended):** every `v*` release tag builds the package automatically (version taken
 from the tag) — grab the `.msix` from that run's artifacts. For a Store-only rebuild, use the
-Actions tab ▸ *Build MSIX (Store)* ▸ *Run workflow* ▸ enter the version (e.g. `1.3.4`).
+Actions tab ▸ *Build MSIX (Store)* ▸ *Run workflow* ▸ enter the version (e.g. `1.3.5`).
 
 **Locally:**
 ```powershell
-pwsh packaging/msix/build-msix.ps1 -Version 1.3.4
+pwsh packaging/msix/build-msix.ps1 -Version 1.3.5
 ```
 
 The MSIX payload is published **self-contained but not single-file** (`-p:PublishSingleFile=false`,

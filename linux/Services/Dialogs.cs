@@ -7,7 +7,7 @@ namespace VirtualDesktopIndicator.Linux.Services;
 /// <summary>Tiny code-built message/confirm dialog (Avalonia ships no MessageBox).</summary>
 public static class Dialogs
 {
-    private const string Caption = "Virtual Desktop Indicator";
+    private const string Caption = "DeskCue";
 
     public static Task ShowInfoAsync(string message) => ShowAsync(message, confirm: false);
 

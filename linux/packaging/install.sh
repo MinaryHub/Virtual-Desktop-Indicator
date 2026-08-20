@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Per-user installer for Virtual Desktop Indicator (Linux/X11).
+# Per-user installer for DeskCue (Linux/X11).
 # Installs the binary to ~/.local/bin and a menu entry to ~/.local/share/applications.
 set -euo pipefail
 
@@ -15,7 +15,7 @@ install -m 755 virtual-desktop-indicator "$BIN"
 cat > "$APP_DIR/virtual-desktop-indicator.desktop" <<EOF
 [Desktop Entry]
 Type=Application
-Name=Virtual Desktop Indicator
+Name=DeskCue
 Comment=Show and switch the current virtual desktop
 Exec=$BIN
 Terminal=false

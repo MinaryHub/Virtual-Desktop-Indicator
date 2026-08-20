@@ -12,15 +12,21 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>app.ico</ApplicationIcon>
+    <!-- Assembly/exe name predates the DeskCue rename and stays put: the installer's
+         AppExe, the autostart Run value and the MSIX manifest all reference it. -->
     <AssemblyName>VirtualDesktopIndicator</AssemblyName>
     <RootNamespace>VirtualDesktopIndicator</RootNamespace>
+    <!-- Shell-visible product metadata (Task Manager, file properties, UAC): the product
+         name, unlike AssemblyName above which is the identifier. -->
+    <AssemblyTitle>DeskCue</AssemblyTitle>
+    <Product>DeskCue</Product>
 
     <!-- Release version: bump these by hand for a meaningful release.
          The 4th (build) component is stamped automatically on every build
          by the StampBuildVersion target below (see build.counter).
          CI passes an explicit -p:Version=<tag> and -p:SkipVersionStamp=true
          so release builds carry the exact tag version instead of a local counter. -->
-    <VersionPrefix>1.3.4</VersionPrefix>
+    <VersionPrefix>1.3.5</VersionPrefix>
 
     <!-- DPI is configured via app.manifest (WPF-primary app); silence the WinForms-specific hint. -->
     <NoWarn>WFO0003</NoWarn>

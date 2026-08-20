@@ -1,4 +1,4 @@
-# Virtual Desktop Indicator
+# DeskCue
 
 A tray app that **always shows your current Windows virtual desktop as a
 translucent on-screen overlay** and lets you **jump straight to a specific
@@ -15,21 +15,21 @@ desktop with custom hotkeys**.
 
 Get the latest build from the **[Releases page](https://github.com/knoxxr/Virtual-Desktop-Indicator/releases/latest)** (no .NET install required):
 
-- **Windows**: `VirtualDesktopIndicator-Setup-<version>.exe` — download and run it.
-- **Linux (X11)**: `VirtualDesktopIndicator-linux-x64-<version>.tar.gz` — extract and run `./install.sh` (see [Linux (X11)](#linux-x11) below).
+- **Windows**: `DeskCue-Setup-<version>.exe` — download and run it.
+- **Linux (X11)**: `DeskCue-linux-x64-<version>.tar.gz` — extract and run `./install.sh` (see [Linux (X11)](#linux-x11) below).
 
 On Windows, if it is already installed the app checks for a newer version on startup (see "Updates" below).
 
 ## Install (recommended)
 
-Installer: **`installer/VirtualDesktopIndicator-Setup-<version>.exe`**
+Installer: **`installer/DeskCue-Setup-<version>.exe`**
 
 Double-click it and follow the wizard.
 
 - **No .NET install required** — it is a self-contained build with the runtime bundled, so nothing needs to be pre-installed on the target PC.
-- **No admin rights required** — installs for the current user only (`%LocalAppData%\Programs\Virtual Desktop Indicator`).
+- **No admin rights required** — installs for the current user only (`%LocalAppData%\Programs\DeskCue`).
 - During setup you can choose a **desktop shortcut** (optional) and **Run at Windows startup** (checked by default).
-- Uninstall from **Settings → Apps → Installed apps** or the Start-menu entry *"Uninstall Virtual Desktop Indicator"*; the autostart entry is cleaned up too.
+- Uninstall from **Settings → Apps → Installed apps** or the Start-menu entry *"Uninstall DeskCue"*; the autostart entry is cleaned up too.
 
 ## Requirements / running from source
 
@@ -136,7 +136,7 @@ Open it by double-clicking the tray icon or via the **Settings...** menu.
   You can also check manually via **Check for updates...** in the tray menu or the
   **Check for updates** button in the settings window.
 - **Auto-install** — when a newer version exists, the app shows a prompt and, on
-  your consent, downloads the latest installer (`VirtualDesktopIndicator-Setup-*.exe`),
+  your consent, downloads the latest installer (`DeskCue-Setup-*.exe`),
   runs it, and exits. The wizard replaces the existing files (if a release has no
   installer attached, the release page is opened instead).
 - Version comparison uses `Major.Minor.Patch` only; the local build number (4th part) is ignored.

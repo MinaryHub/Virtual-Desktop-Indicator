@@ -16,6 +16,8 @@ namespace VirtualDesktopIndicator.Services;
 public static class StartupManager
 {
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
+    // Pre-rename spelling on purpose (product name is DeskCue): changing it would leave a
+    // stale Run entry behind on machines that already have autostart enabled.
     private const string ValueName = "VirtualDesktopIndicator";
     private const string TaskId = "VirtualDesktopIndicatorStartup";
 

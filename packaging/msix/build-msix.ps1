@@ -1,11 +1,11 @@
 # Builds the MSIX package locally (for testing before Store submission).
-# Usage from repo root:   pwsh packaging/msix/build-msix.ps1 -Version 1.3.4
+# Usage from repo root:   pwsh packaging/msix/build-msix.ps1 -Version 1.3.5
 #
 # The Store re-signs the package on submission, so signing is NOT required to submit. To
 # SIDELOAD-test the .msix on this machine you must sign it with a certificate whose subject
 # matches Identity/@Publisher and trust that cert — see the notes printed at the end.
 param(
-    [string]$Version = "1.3.4"
+    [string]$Version = "1.3.5"
 )
 $ErrorActionPreference = 'Stop'
 $root = Resolve-Path (Join-Path $PSScriptRoot '..\..')
@@ -49,7 +49,7 @@ try {
         Sort-Object FullName -Descending | Select-Object -First 1
     if (-not $makeappx) { throw "makeappx.exe not found. Install the Windows 10/11 SDK." }
 
-    $out = Join-Path $root "VirtualDesktopIndicator-$Version.msix"
+    $out = Join-Path $root "DeskCue-$Version.msix"
     Write-Host "Packing $out ..." -ForegroundColor Cyan
     & $makeappx.FullName pack /d $stage /p $out /o
     if ($LASTEXITCODE -ne 0) { throw "makeappx pack failed" }

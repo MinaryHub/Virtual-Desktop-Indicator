@@ -30,7 +30,7 @@
     ProcessorArchitecture="x64" />
 
   <Properties>
-    <DisplayName>Virtual Desktop Indicator</DisplayName>
+    <DisplayName>DeskCue</DisplayName>
     <PublisherDisplayName>PLACEHOLDER</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -51,7 +51,7 @@
                  Executable="VirtualDesktopIndicator.exe"
                  EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
-        DisplayName="Virtual Desktop Indicator"
+        DisplayName="DeskCue"
         Description="Always-on-top indicator showing the current Windows virtual desktop, with hotkeys to jump to any desktop."
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
@@ -71,7 +71,7 @@
           <uap5:StartupTask
             TaskId="VirtualDesktopIndicatorStartup"
             Enabled="false"
-            DisplayName="Virtual Desktop Indicator" />
+            DisplayName="DeskCue" />
         </uap5:Extension>
       </Extensions>
     </Application>

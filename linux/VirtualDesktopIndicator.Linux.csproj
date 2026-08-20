@@ -9,6 +9,8 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <AssemblyName>virtual-desktop-indicator</AssemblyName>
     <RootNamespace>VirtualDesktopIndicator.Linux</RootNamespace>
+    <AssemblyTitle>DeskCue</AssemblyTitle>
+    <Product>DeskCue</Product>
 
     <!-- Same auto-versioning scheme as the Windows app; CI overrides via -p:Version + SkipVersionStamp. -->
     <VersionPrefix>1.2.0</VersionPrefix>

@@ -58,7 +58,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create "${{ github.ref_name }}" `
-            "installer\VirtualDesktopIndicator-Setup-${{ steps.ver.outputs.version }}.exe" `
+            "installer\DeskCue-Setup-${{ steps.ver.outputs.version }}.exe" `
             --title "${{ github.ref_name }}" `
             --generate-notes
 
@@ -102,8 +102,8 @@ jobs:
         shell: bash
         run: |
           VER="${{ steps.ver.outputs.version }}"
-          STAGE="virtual-desktop-indicator-$VER"
-          TARBALL="VirtualDesktopIndicator-linux-x64-$VER.tar.gz"
+          STAGE="deskcue-$VER"
+          TARBALL="DeskCue-linux-x64-$VER.tar.gz"
           mkdir -p "$STAGE"
           cp publish-linux/virtual-desktop-indicator "$STAGE/"
           cp linux/packaging/install.sh linux/packaging/uninstall.sh "$STAGE/"

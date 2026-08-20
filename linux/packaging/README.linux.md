@@ -1,4 +1,4 @@
-# Virtual Desktop Indicator (Linux / X11)
+# DeskCue (Linux / X11)
 
 A tray app that shows your current virtual desktop as a translucent overlay and
 lets you jump to a desktop with global hotkeys. This is the **Linux/X11** build.

@@ -1,8 +1,8 @@
-; Inno Setup script for Virtual Desktop Indicator
+; Inno Setup script for DeskCue
 ; Build with:  "%LocalAppData%\Programs\Inno Setup 6\ISCC.exe" installer.iss
-; Produces:    installer\VirtualDesktopIndicator-Setup-<version>.exe
+; Produces:    installer\DeskCue-Setup-<version>.exe
 
-#define AppName "Virtual Desktop Indicator"
+#define AppName "DeskCue"
 #define AppPublisher "SMIC"
 #define AppExe "VirtualDesktopIndicator.exe"
 ; Version comes from the published exe (stamped by the StampBuildVersion MSBuild
@@ -13,7 +13,9 @@
 #endif
 
 [Setup]
-; A fixed AppId ties upgrades and uninstall together across versions.
+; A fixed AppId ties upgrades and uninstall together across versions. It (and AppExe,
+; and the Run value below) deliberately keeps the pre-rename identity so installs from
+; before the DeskCue rename upgrade in place instead of installing a second copy.
 AppId={{B7E5B2A1-4C3D-4E6F-9A2B-1D2E3F4A5B6C}
 AppName={#AppName}
 AppVersion={#AppVersion}
@@ -25,7 +27,7 @@ DisableProgramGroupPage=yes
 UninstallDisplayIcon={app}\{#AppExe}
 UninstallDisplayName={#AppName}
 OutputDir=installer
-OutputBaseFilename=VirtualDesktopIndicator-Setup-{#AppVersion}
+OutputBaseFilename=DeskCue-Setup-{#AppVersion}
 SetupIconFile=app.ico
 Compression=lzma2/max
 SolidCompression=yes

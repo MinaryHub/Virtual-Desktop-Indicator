@@ -63,7 +63,7 @@ public static class StartupManager
                 var content =
                     "[Desktop Entry]\n" +
                     "Type=Application\n" +
-                    "Name=Virtual Desktop Indicator\n" +
+                    "Name=DeskCue\n" +
                     $"Exec=\"{exec}\"\n" +
                     "X-GNOME-Autostart-enabled=true\n" +
                     "Terminal=false\n";

@@ -7,6 +7,8 @@ namespace VirtualDesktopIndicator.Services;
 
 /// <summary>
 /// User configuration, persisted as JSON under %APPDATA%\VirtualDesktopIndicator\config.json.
+/// The folder keeps the pre-rename name on purpose: the product is DeskCue, but renaming the
+/// path would orphan every existing user's settings.
 /// The file is created with defaults on first run and can be edited by hand
 /// (tray menu → "Open config file", then "Reload config").
 /// </summary>

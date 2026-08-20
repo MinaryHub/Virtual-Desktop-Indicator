@@ -57,7 +57,7 @@ public partial class App : System.Windows.Application
     {
         var menu = new Forms.ContextMenuStrip();
 
-        menu.Items.Add(new Forms.ToolStripMenuItem($"Virtual Desktop Indicator {AppVersion.Display}") { Enabled = false });
+        menu.Items.Add(new Forms.ToolStripMenuItem($"DeskCue {AppVersion.Display}") { Enabled = false });
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("Settings...", null, (_, _) => OpenSettings());
         // The Store build updates through the Store, so hide the manual GitHub update check there.
@@ -98,7 +98,7 @@ public partial class App : System.Windows.Application
         {
             Icon = BuildIcon(),
             Visible = true,
-            Text = $"Virtual Desktop Indicator {AppVersion.Display}",
+            Text = $"DeskCue {AppVersion.Display}",
             ContextMenuStrip = menu,
         };
         _tray.DoubleClick += (_, _) => OpenSettings();

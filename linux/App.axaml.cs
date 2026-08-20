@@ -58,7 +58,7 @@ public partial class App : Application
     {
         var menu = new NativeMenu();
 
-        menu.Add(new NativeMenuItem($"Virtual Desktop Indicator {AppVersion.Display}") { IsEnabled = false });
+        menu.Add(new NativeMenuItem($"DeskCue {AppVersion.Display}") { IsEnabled = false });
         menu.Add(new NativeMenuItemSeparator());
 
         var settingsItem = new NativeMenuItem("Settings...");
@@ -107,7 +107,7 @@ public partial class App : Application
         _tray = new TrayIcon
         {
             Icon = IconFactory.BuildTrayIcon(),
-            ToolTipText = $"Virtual Desktop Indicator {AppVersion.Display}",
+            ToolTipText = $"DeskCue {AppVersion.Display}",
             IsVisible = true,
             Menu = menu,
         };

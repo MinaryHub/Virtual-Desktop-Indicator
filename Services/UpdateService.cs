@@ -84,7 +84,7 @@ public static class UpdateService
     public static async Task<string> DownloadInstallerAsync(string url, CancellationToken ct = default)
     {
         string name = Path.GetFileName(new Uri(url).LocalPath);
-        if (string.IsNullOrWhiteSpace(name)) name = "VirtualDesktopIndicator-Setup.exe";
+        if (string.IsNullOrWhiteSpace(name)) name = "DeskCue-Setup.exe";
         string dest = Path.Combine(Path.GetTempPath(), name);
 
         using (var resp = await Http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, ct))

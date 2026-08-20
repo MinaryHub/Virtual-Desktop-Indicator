@@ -10,7 +10,7 @@ namespace VirtualDesktopIndicator;
 /// </summary>
 public static class UpdateFlow
 {
-    private const string Caption = "Virtual Desktop Indicator";
+    private const string Caption = "DeskCue";
 
     /// <summary>
     /// Reacts to a completed <see cref="UpdateService.CheckAsync"/> result.
