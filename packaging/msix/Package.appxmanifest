@@ -26,7 +26,7 @@
   IgnorableNamespaces="uap uap5 rescap">
 
   <Identity
-    Name="minary.DeskCue"
+    Name="minary.Curvo"
     Publisher="CN=C460CD23-2642-4BA2-A332-6F8ADBE54E1F"
     Version="1.0.0.0"
     ProcessorArchitecture="x64" />
