@@ -21,8 +21,9 @@ binaries** ship through both the Store and the Inno Setup installer:
 - `Assets/` — logo PNGs (committed; regenerate with `generate-assets.ps1`).
 - `generate-assets.ps1` — renders the "VD" tile at every required size.
 - `build-msix.ps1` — builds the `.msix` locally for testing.
-- `../../.github/workflows/msix.yml` — CI: builds the `.msix` as a downloadable artifact, on
-  every `v*` tag and on manual dispatch.
+- `../../.github/workflows/msix.yml` — CI: builds the `.msix`, uploads it as a workflow artifact
+  and (on tag builds) attaches it to the GitHub Release. Reusable: called by `release.yml` on
+  every `v*` tag, and runnable on its own via manual dispatch.
 
 ## ⚠️ Before your first submission — fill in three identity values
 
@@ -40,13 +41,14 @@ You do **not** need a code-signing certificate: the Store re-signs the package o
 
 ## Build the package
 
-**In CI (recommended):** every `v*` release tag builds the package automatically (version taken
-from the tag) — grab the `.msix` from that run's artifacts. For a Store-only rebuild, use the
-Actions tab ▸ *Build MSIX (Store)* ▸ *Run workflow* ▸ enter the version (e.g. `1.3.5`).
+**In CI (recommended):** every `v*` release tag builds the package automatically — the release
+workflow calls this one after creating the GitHub Release, so the `.msix` is both a workflow
+artifact and a **release asset** next to the installer. For a Store-only rebuild, use the
+Actions tab ▸ *Build MSIX (Store)* ▸ *Run workflow* ▸ enter the version (e.g. `1.3.6`).
 
 **Locally:**
 ```powershell
-pwsh packaging/msix/build-msix.ps1 -Version 1.3.5
+pwsh packaging/msix/build-msix.ps1 -Version 1.3.6
 ```
 
 The MSIX payload is published **self-contained but not single-file** (`-p:PublishSingleFile=false`,

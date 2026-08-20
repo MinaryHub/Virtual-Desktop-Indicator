@@ -12,6 +12,8 @@ permissions:
 jobs:
   windows:
     runs-on: windows-latest
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -117,3 +119,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload "${{ github.ref_name }}" "${{ steps.pack.outputs.tarball }}" --clobber
+
+  # Store package. Runs after `windows` so the release already exists when the reusable
+  # workflow attaches the .msix to it.
+  msix:
+    needs: windows
+    permissions:
+      contents: write
+    uses: ./.github/workflows/msix.yml
+    with:
+      version: ${{ needs.windows.outputs.version }}

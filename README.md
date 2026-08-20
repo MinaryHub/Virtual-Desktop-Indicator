@@ -17,6 +17,17 @@ Get the latest build from the **[Releases page](https://github.com/knoxxr/Virtua
 
 - **Windows**: `DeskCue-Setup-<version>.exe` — download and run it.
 - **Linux (X11)**: `DeskCue-linux-x64-<version>.tar.gz` — extract and run `./install.sh` (see [Linux (X11)](#linux-x11) below).
+- **Windows (MSIX)**: `DeskCue-<version>.msix` — the same build as the Microsoft Store package,
+  attached for sideloading. It is **unsigned**, so installing it takes an elevated PowerShell and,
+  because the package carries executable content, Windows installs it **for all users**:
+
+  ```powershell
+  Add-AppxPackage -Path .\DeskCue-<version>.msix -AllowUnsigned
+  ```
+
+  Prefer the `Setup.exe` above unless you specifically want the packaged build — that one is
+  per-user and needs no admin rights. The Store version, once published, is signed by Microsoft
+  and installs normally.
 
 On Windows, if it is already installed the app checks for a newer version on startup (see "Updates" below).
 

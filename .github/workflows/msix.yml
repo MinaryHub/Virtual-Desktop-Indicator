@@ -1,27 +1,30 @@
 name: Build MSIX (Store)
 
-# Builds the Microsoft Store MSIX package. Runs on every v* tag (version taken from the tag),
-# or manually from the Actions tab with an explicit version (e.g. 1.3.5). The resulting .msix
-# is uploaded as a workflow artifact — download it
-# and upload it to Partner Center. The Store re-signs the package, so no certificate is needed
-# here. (Requires the three Partner Center identity placeholders in
-# packaging/msix/Package.appxmanifest to be filled in first, or the package won't match your
-# reserved Store identity.)
+# Builds the Microsoft Store MSIX package.
+#
+# Called by the release workflow on every v* tag (after the release exists, so the .msix can be
+# attached to it), and runnable on its own from the Actions tab for a Store-only rebuild. Either
+# way the .msix is also uploaded as a workflow artifact.
+#
+# The Store re-signs the package on ingestion, so no certificate is needed here. (The three
+# Partner Center identity placeholders in packaging/msix/Package.appxmanifest must be filled in
+# before the package matches your reserved Store identity.)
 on:
-  # Cutting a release builds the Store package too, so the .msix and the GitHub installer
-  # always come from the same commit. Still runnable by hand for a Store-only rebuild.
-  push:
-    tags:
-      - 'v*'
+  workflow_call:
+    inputs:
+      version:
+        description: 'Package version (x.y.z — revision .0 is appended automatically)'
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       version:
         description: 'Package version (x.y.z — revision .0 is appended automatically)'
         required: true
-        default: '1.3.5'
+        default: '1.3.6'
 
 permissions:
-  contents: read
+  contents: write   # attaching the .msix to the release on tag builds
 
 jobs:
   msix:
@@ -39,8 +42,9 @@ jobs:
         id: ver
         shell: pwsh
         run: |
-          $v = "${{ github.event.inputs.version }}"
-          if (-not $v) { $v = "${{ github.ref_name }}".TrimStart('v') }
+          # `inputs` covers both triggers: the release workflow passes the tag version, a manual
+          # run passes whatever was typed in.
+          $v = "${{ inputs.version }}"
           if ($v -notmatch '^\d+\.\d+\.\d+$') { throw "Version must be x.y.z, got '$v'" }
           "version=$v" >> $env:GITHUB_OUTPUT
           Write-Host "Package version: $v"
@@ -109,3 +113,13 @@ jobs:
           name: DeskCue-msix-${{ steps.ver.outputs.version }}
           path: DeskCue-*.msix
           if-no-files-found: error
+
+      # Tag builds only: the release workflow calls this after creating the release, so the
+      # asset lands next to the installer and the Linux tarball.
+      - name: Attach the MSIX to the release
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.ref_name }}" "DeskCue-${{ steps.ver.outputs.version }}.msix" --clobber
