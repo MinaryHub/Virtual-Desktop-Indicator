@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace VirtualDesktopIndicator.Linux.Services;
+namespace DeskCue.Linux.Services;
 
 /// <summary>
 /// Minimal P/Invoke bindings to libX11 used for EWMH desktop queries/switching

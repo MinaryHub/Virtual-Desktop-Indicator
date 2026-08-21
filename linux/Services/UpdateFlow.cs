@@ -1,4 +1,4 @@
-namespace VirtualDesktopIndicator.Linux.Services;
+namespace DeskCue.Linux.Services;
 
 /// <summary>
 /// Shared update-check UI flow. On Linux the app does not self-install; on

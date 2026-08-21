@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace VirtualDesktopIndicator.Linux.Services;
+namespace DeskCue.Linux.Services;
 
 /// <summary>
 /// Makes an X11 window click-through by setting an empty input shape via the

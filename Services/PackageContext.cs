@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace VirtualDesktopIndicator.Services;
+namespace DeskCue.Services;
 
 /// <summary>
 /// Tells whether we are running from an installed MSIX package (Microsoft Store /

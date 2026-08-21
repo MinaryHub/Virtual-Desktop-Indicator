@@ -1,10 +1,10 @@
 using System.Reflection;
 
-namespace VirtualDesktopIndicator.Services;
+namespace DeskCue.Services;
 
 /// <summary>
 /// Exposes the running app's version, stamped at build time by the
-/// StampBuildVersion MSBuild target (see VirtualDesktopIndicator.csproj).
+/// StampBuildVersion MSBuild target (see DeskCue.csproj).
 /// </summary>
 public static class AppVersion
 {

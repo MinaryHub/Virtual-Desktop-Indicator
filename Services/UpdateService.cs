@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace VirtualDesktopIndicator.Services;
+namespace DeskCue.Services;
 
 /// <summary>Outcome of an update check against GitHub Releases.</summary>
 public sealed record UpdateCheckResult(

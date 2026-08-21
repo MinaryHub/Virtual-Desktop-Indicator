@@ -1,12 +1,12 @@
 using System.Windows;
 using System.Windows.Controls;
-using VirtualDesktopIndicator.Services;
+using DeskCue.Services;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
 using ComboBox = System.Windows.Controls.ComboBox;
 using Orientation = System.Windows.Controls.Orientation;
 
-namespace VirtualDesktopIndicator;
+namespace DeskCue;
 
 public partial class SettingsWindow : Window
 {

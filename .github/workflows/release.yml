@@ -88,7 +88,7 @@ jobs:
         shell: bash
         run: |
           VER="${{ steps.ver.outputs.version }}"
-          dotnet publish linux/VirtualDesktopIndicator.Linux.csproj \
+          dotnet publish linux/DeskCue.Linux.csproj \
             -c Release -r linux-x64 --self-contained true \
             -p:PublishSingleFile=true \
             -p:SkipVersionStamp=true \
@@ -107,10 +107,10 @@ jobs:
           STAGE="deskcue-$VER"
           TARBALL="DeskCue-linux-x64-$VER.tar.gz"
           mkdir -p "$STAGE"
-          cp publish-linux/virtual-desktop-indicator "$STAGE/"
+          cp publish-linux/deskcue "$STAGE/"
           cp linux/packaging/install.sh linux/packaging/uninstall.sh "$STAGE/"
           cp linux/packaging/README.linux.md "$STAGE/README.md"
-          chmod +x "$STAGE/virtual-desktop-indicator" "$STAGE"/*.sh
+          chmod +x "$STAGE/deskcue" "$STAGE"/*.sh
           tar czf "$TARBALL" "$STAGE"
           echo "tarball=$TARBALL" >> "$GITHUB_OUTPUT"
 

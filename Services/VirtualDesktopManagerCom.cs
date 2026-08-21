@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace VirtualDesktopIndicator.Services;
+namespace DeskCue.Services;
 
 /// <summary>
 /// Thin wrapper over the DOCUMENTED IVirtualDesktopManager COM interface.

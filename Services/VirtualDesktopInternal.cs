@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace VirtualDesktopIndicator.Services;
+namespace DeskCue.Services;
 
 /// <summary>
 /// Direct desktop switching via the UNDOCUMENTED IVirtualDesktopManagerInternal COM interface.

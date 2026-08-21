@@ -4,10 +4,10 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using VirtualDesktopIndicator.Linux.Services;
-using HotKeyManager = VirtualDesktopIndicator.Linux.Services.HotKeyManager;
+using DeskCue.Linux.Services;
+using HotKeyManager = DeskCue.Linux.Services.HotKeyManager;
 
-namespace VirtualDesktopIndicator.Linux;
+namespace DeskCue.Linux;
 
 public partial class App : Application
 {
@@ -25,6 +25,11 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+        // Before the first Log.Write: logging creates the settings folder, which would
+        // make the folder migration below think there is nothing to carry over.
+        AppConfig.MigrateLegacyFolder();
+        StartupManager.MigrateLegacyEntry();
 
         Log.Write("=== app startup ===");
         _config = AppConfig.Load();

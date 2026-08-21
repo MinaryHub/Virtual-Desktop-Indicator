@@ -1,6 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        x:Class="VirtualDesktopIndicator.Linux.SettingsWindow"
+        x:Class="DeskCue.Linux.SettingsWindow"
         Title="DeskCue - Settings"
         Width="560"
         SizeToContent="Height"

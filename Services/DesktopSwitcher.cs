@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace VirtualDesktopIndicator.Services;
+namespace DeskCue.Services;
 
 /// <summary>
 /// Switches virtual desktops by synthesising the built-in Windows shortcuts

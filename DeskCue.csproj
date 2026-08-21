@@ -14,8 +14,8 @@
     <ApplicationIcon>app.ico</ApplicationIcon>
     <!-- Assembly/exe name predates the DeskCue rename and stays put: the installer's
          AppExe, the autostart Run value and the MSIX manifest all reference it. -->
-    <AssemblyName>VirtualDesktopIndicator</AssemblyName>
-    <RootNamespace>VirtualDesktopIndicator</RootNamespace>
+    <AssemblyName>DeskCue</AssemblyName>
+    <RootNamespace>DeskCue</RootNamespace>
     <!-- Shell-visible product metadata (Task Manager, file properties, UAC): the product
          name, unlike AssemblyName above which is the identifier. -->
     <AssemblyTitle>DeskCue</AssemblyTitle>

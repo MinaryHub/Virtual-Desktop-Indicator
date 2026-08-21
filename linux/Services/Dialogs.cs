@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 
-namespace VirtualDesktopIndicator.Linux.Services;
+namespace DeskCue.Linux.Services;
 
 /// <summary>Tiny code-built message/confirm dialog (Avalonia ships no MessageBox).</summary>
 public static class Dialogs

@@ -2,7 +2,7 @@ using System.Diagnostics;
 using Microsoft.Win32;
 using Windows.ApplicationModel;
 
-namespace VirtualDesktopIndicator.Services;
+namespace DeskCue.Services;
 
 /// <summary>
 /// Enables/disables "run at Windows startup".
@@ -18,8 +18,10 @@ public static class StartupManager
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
     // Pre-rename spelling on purpose (product name is DeskCue): changing it would leave a
     // stale Run entry behind on machines that already have autostart enabled.
-    private const string ValueName = "VirtualDesktopIndicator";
-    private const string TaskId = "VirtualDesktopIndicatorStartup";
+    private const string ValueName = "DeskCue";
+    // Value name used before the rename; see MigrateLegacyRunValue below.
+    private const string LegacyValueName = "VirtualDesktopIndicator";
+    private const string TaskId = "DeskCueStartup";
 
     /// <summary>Path to the running .exe (works for the published single-file app).</summary>
     public static string ExePath
@@ -30,6 +32,29 @@ public static class StartupManager
             if (!string.IsNullOrEmpty(p)) return p;
             return Process.GetCurrentProcess().MainModule?.FileName ?? "";
         }
+    }
+
+    /// <summary>
+    /// Drops the Run entry written under the pre-rename value name, re-creating it under the
+    /// current one when it was enabled. Without this an upgraded install would autostart from
+    /// a stale entry pointing at the old .exe path (and the tray checkbox would read false).
+    /// No-op in the packaged build, which uses the StartupTask API instead of the registry.
+    /// </summary>
+    public static void MigrateLegacyRunValue()
+    {
+        if (PackageContext.IsPackaged) return;
+
+        try
+        {
+            using var k = Registry.CurrentUser.OpenSubKey(RunKey, writable: true);
+            if (k?.GetValue(LegacyValueName) is not string legacy || string.IsNullOrWhiteSpace(legacy)) return;
+
+            k.DeleteValue(LegacyValueName, throwOnMissingValue: false);
+            if (k.GetValue(ValueName) == null)
+                k.SetValue(ValueName, $"\"{ExePath}\"");
+            Log.Write("migrated autostart entry to the DeskCue value name");
+        }
+        catch (Exception ex) { Log.Write($"autostart migration failed: {ex.Message}"); }
     }
 
     public static bool IsEnabled()

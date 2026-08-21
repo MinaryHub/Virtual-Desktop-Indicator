@@ -1,9 +1,9 @@
 using System.Windows;
 using System.Windows.Threading;
-using VirtualDesktopIndicator.Services;
+using DeskCue.Services;
 using Forms = System.Windows.Forms;
 
-namespace VirtualDesktopIndicator;
+namespace DeskCue;
 
 /// <summary>
 /// Owns the app's single set of shared machinery — global hotkeys, the poll timer, the

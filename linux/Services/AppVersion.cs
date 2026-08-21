@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace VirtualDesktopIndicator.Linux.Services;
+namespace DeskCue.Linux.Services;
 
 /// <summary>App version stamped at build time by the StampBuildVersion target.</summary>
 public static class AppVersion

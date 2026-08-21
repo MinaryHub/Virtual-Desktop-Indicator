@@ -2,9 +2,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Threading;
-using VirtualDesktopIndicator.Linux.Services;
+using DeskCue.Linux.Services;
 
-namespace VirtualDesktopIndicator.Linux;
+namespace DeskCue.Linux;
 
 public partial class OverlayWindow : Window
 {

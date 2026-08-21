@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace VirtualDesktopIndicator.Linux.Services;
+namespace DeskCue.Linux.Services;
 
 /// <summary>Snapshot of the current EWMH desktop state.</summary>
 public sealed record DesktopInfo(int Index, int Count, string Name)

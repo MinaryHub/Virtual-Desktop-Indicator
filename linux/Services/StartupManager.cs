@@ -1,16 +1,19 @@
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
-namespace VirtualDesktopIndicator.Linux.Services;
+namespace DeskCue.Linux.Services;
 
 /// <summary>
 /// Enables/disables "run at login" by writing a freedesktop.org autostart entry
-/// to $XDG_CONFIG_HOME/autostart/virtual-desktop-indicator.desktop
+/// to $XDG_CONFIG_HOME/autostart/deskcue.desktop
 /// (~/.config/autostart/... by default). Per-user, no root required.
 /// </summary>
 public static class StartupManager
 {
-    private const string FileName = "virtual-desktop-indicator.desktop";
+    private const string FileName = "deskcue.desktop";
+    // Entry name used before the rename; see MigrateLegacyEntry below.
+    private const string LegacyFileName = "virtual-desktop-indicator.desktop";
 
     private static string AutostartDir
     {
@@ -35,6 +38,27 @@ public static class StartupManager
             if (!string.IsNullOrEmpty(p)) return p;
             return Process.GetCurrentProcess().MainModule?.FileName ?? "";
         }
+    }
+
+    /// <summary>
+    /// Replaces the autostart entry written under the pre-rename filename. The old entry points
+    /// at the old binary path, which the installer no longer ships, so leaving it behind would
+    /// mean a failing autostart plus a toggle that reads "off".
+    /// </summary>
+    public static void MigrateLegacyEntry()
+    {
+        try
+        {
+            var legacy = Path.Combine(AutostartDir, LegacyFileName);
+            if (!File.Exists(legacy)) return;
+
+            bool wasEnabled = !File.ReadLines(legacy).Any(l =>
+                l.Trim().Replace(" ", "").Equals("Hidden=true", StringComparison.OrdinalIgnoreCase));
+            File.Delete(legacy);
+            if (wasEnabled && !File.Exists(EntryPath)) SetEnabled(true);
+            Log.Write("migrated autostart entry to deskcue.desktop");
+        }
+        catch (Exception ex) { Log.Write($"autostart migration failed: {ex.Message}"); }
     }
 
     public static bool IsEnabled()

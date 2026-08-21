@@ -1,10 +1,10 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows;
-using VirtualDesktopIndicator.Services;
+using DeskCue.Services;
 using Forms = System.Windows.Forms;
 
-namespace VirtualDesktopIndicator;
+namespace DeskCue;
 
 public partial class App : System.Windows.Application
 {
@@ -17,6 +17,11 @@ public partial class App : System.Windows.Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        // Before the first Log.Write: logging creates the settings folder, and an existing new
+        // folder makes the migration below decide there is nothing to carry over.
+        AppConfig.MigrateLegacyFolder();
+        StartupManager.MigrateLegacyRunValue();
 
         Log.Write("=== app startup ===");
 
@@ -195,10 +200,12 @@ public partial class App : System.Windows.Application
             using var pen = new Pen(Color.FromArgb(220, 90, 160, 250), 2);
             g.DrawPath(pen, path);
 
-            using var font = new Font("Segoe UI", 12, System.Drawing.FontStyle.Bold, GraphicsUnit.Pixel);
+            // 11px, not 12: "DC" is wider than the old "VD", and this keeps the same optical
+            // margin inside the plate as the generated tiles (see generate-assets.ps1).
+            using var font = new Font("Segoe UI", 11, System.Drawing.FontStyle.Bold, GraphicsUnit.Pixel);
             using var fg = new SolidBrush(Color.White);
             var sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center };
-            g.DrawString("VD", font, fg, new RectangleF(0, 0, 32, 32), sf);
+            g.DrawString("DC", font, fg, new RectangleF(0, 0, 32, 32), sf);
         }
 
         IntPtr hIcon = bmp.GetHicon();

@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Microsoft.Win32;
 
-namespace VirtualDesktopIndicator.Services;
+namespace DeskCue.Services;
 
 public sealed record DesktopInfo(int Index, int Count, string Name, Guid CurrentId);
 

@@ -3,10 +3,10 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace VirtualDesktopIndicator.Services;
+namespace DeskCue.Services;
 
 /// <summary>
-/// User configuration, persisted as JSON under %APPDATA%\VirtualDesktopIndicator\config.json.
+/// User configuration, persisted as JSON under %APPDATA%\DeskCue\config.json.
 /// The folder keeps the pre-rename name on purpose: the product is DeskCue, but renaming the
 /// path would orphan every existing user's settings.
 /// The file is created with defaults on first run and can be edited by hand
@@ -69,9 +69,37 @@ public sealed class AppConfig
     // -------------------------------------------------------------------------
     public static string ConfigDirectory =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                     "VirtualDesktopIndicator");
+                     "DeskCue");
 
     public static string ConfigPath => Path.Combine(ConfigDirectory, "config.json");
+
+    /// <summary>
+    /// Folder the app used before it was renamed to DeskCue. Installs from those versions keep
+    /// their config.json (and debug.log) there, so <see cref="MigrateLegacyFolder"/> moves the
+    /// whole folder across on first run rather than silently starting from defaults.
+    /// </summary>
+    private static string LegacyConfigDirectory =>
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                     "VirtualDesktopIndicator");
+
+    /// <summary>
+    /// One-time move of the pre-rename settings folder. Safe to call on every start: it does
+    /// nothing once the new folder exists, and a failure just means defaults are used.
+    /// </summary>
+    public static void MigrateLegacyFolder()
+    {
+        try
+        {
+            if (Directory.Exists(ConfigDirectory) || !Directory.Exists(LegacyConfigDirectory)) return;
+            Directory.Move(LegacyConfigDirectory, ConfigDirectory);
+            Log.Write($"migrated settings from {LegacyConfigDirectory}");
+        }
+        catch (Exception ex)
+        {
+            // Log lives in the same folder, so this may well be what failed; never throw.
+            Log.Write($"settings migration failed: {ex.Message}");
+        }
+    }
 
     private static readonly JsonSerializerOptions JsonOpts = new()
     {

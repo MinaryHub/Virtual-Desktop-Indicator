@@ -6,9 +6,9 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 
-namespace VirtualDesktopIndicator.Linux.Services;
+namespace DeskCue.Linux.Services;
 
-/// <summary>Draws the little "VD" tray icon at runtime so we ship no image asset.</summary>
+/// <summary>Draws the little "DC" tray icon at runtime so we ship no image asset.</summary>
 public static class IconFactory
 {
     public static WindowIcon BuildTrayIcon()
@@ -21,8 +21,10 @@ public static class IconFactory
             var pen = new Pen(new SolidColorBrush(Color.FromArgb(220, 90, 160, 250)), 2);
             ctx.DrawRectangle(bg, pen, new RoundedRect(new Rect(1, 1, 30, 30), 6));
 
-            var text = new FormattedText("VD", CultureInfo.InvariantCulture,
-                FlowDirection.LeftToRight, new Typeface("sans-serif"), 13, Brushes.White);
+            // 12px, not 13: "DC" is the wider pair, and this keeps the plate's optical margin
+            // matching the generated Windows tiles (packaging/msix/generate-assets.ps1).
+            var text = new FormattedText("DC", CultureInfo.InvariantCulture,
+                FlowDirection.LeftToRight, new Typeface("sans-serif"), 12, Brushes.White);
             ctx.DrawText(text, new Point((32 - text.Width) / 2, (32 - text.Height) / 2));
         }
 

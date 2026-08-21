@@ -1,8 +1,8 @@
 using System.Windows;
-using VirtualDesktopIndicator.Services;
+using DeskCue.Services;
 using MessageBox = System.Windows.MessageBox;
 
-namespace VirtualDesktopIndicator;
+namespace DeskCue;
 
 /// <summary>
 /// Shared UI flow for update checks: notify the user of a new version and,

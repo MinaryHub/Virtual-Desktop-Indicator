@@ -7,8 +7,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <AssemblyName>virtual-desktop-indicator</AssemblyName>
-    <RootNamespace>VirtualDesktopIndicator.Linux</RootNamespace>
+    <AssemblyName>deskcue</AssemblyName>
+    <RootNamespace>DeskCue.Linux</RootNamespace>
     <AssemblyTitle>DeskCue</AssemblyTitle>
     <Product>DeskCue</Product>
 

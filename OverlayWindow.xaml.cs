@@ -2,13 +2,13 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
-using VirtualDesktopIndicator.Services;
+using DeskCue.Services;
 using Color = System.Windows.Media.Color;
 using Brush = System.Windows.Media.Brush;
 using ColorConverter = System.Windows.Media.ColorConverter;
 using Forms = System.Windows.Forms;
 
-namespace VirtualDesktopIndicator;
+namespace DeskCue;
 
 /// <summary>
 /// A single indicator window. One instance is created per target monitor by

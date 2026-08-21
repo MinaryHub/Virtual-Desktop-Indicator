@@ -3,11 +3,11 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace VirtualDesktopIndicator.Linux.Services;
+namespace DeskCue.Linux.Services;
 
 /// <summary>
 /// User configuration, persisted as JSON under
-/// $XDG_CONFIG_HOME/VirtualDesktopIndicator/config.json (~/.config/... by default).
+/// $XDG_CONFIG_HOME/DeskCue/config.json (~/.config/... by default).
 /// </summary>
 public sealed class AppConfig
 {
@@ -58,11 +58,39 @@ public sealed class AppConfig
             var baseDir = !string.IsNullOrWhiteSpace(xdg)
                 ? xdg
                 : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config");
-            return Path.Combine(baseDir, "VirtualDesktopIndicator");
+            return Path.Combine(baseDir, "DeskCue");
         }
     }
 
     public static string ConfigPath => Path.Combine(ConfigDirectory, "config.json");
+
+    /// <summary>Folder used before the rename to DeskCue; migrated once on first run.</summary>
+    private static string LegacyConfigDirectory
+    {
+        get
+        {
+            var xdg = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+            var baseDir = !string.IsNullOrWhiteSpace(xdg)
+                ? xdg
+                : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config");
+            return Path.Combine(baseDir, "VirtualDesktopIndicator");
+        }
+    }
+
+    /// <summary>
+    /// One-time move of the pre-rename settings folder. No-op once the new folder exists, and a
+    /// failure only costs the user their old settings rather than crashing the app.
+    /// </summary>
+    public static void MigrateLegacyFolder()
+    {
+        try
+        {
+            if (Directory.Exists(ConfigDirectory) || !Directory.Exists(LegacyConfigDirectory)) return;
+            Directory.Move(LegacyConfigDirectory, ConfigDirectory);
+            Log.Write($"migrated settings from {LegacyConfigDirectory}");
+        }
+        catch (Exception ex) { Log.Write($"settings migration failed: {ex.Message}"); }
+    }
 
     private static readonly JsonSerializerOptions JsonOpts = new()
     {

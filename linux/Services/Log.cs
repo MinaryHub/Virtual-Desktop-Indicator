@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace VirtualDesktopIndicator.Linux.Services;
+namespace DeskCue.Linux.Services;
 
 /// <summary>Best-effort debug log under the config directory.</summary>
 public static class Log

@@ -2,9 +2,9 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
-using VirtualDesktopIndicator.Linux.Services;
+using DeskCue.Linux.Services;
 
-namespace VirtualDesktopIndicator.Linux;
+namespace DeskCue.Linux;
 
 public partial class SettingsWindow : Window
 {

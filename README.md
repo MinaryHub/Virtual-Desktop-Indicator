@@ -64,7 +64,7 @@ update check, adapted to Linux:
 - **Global hotkeys** use X11 key grabs (`XGrabKey`). The "Windows" modifier is the
   **Super** key on Linux; defaults remain `Ctrl+Alt+1`…`Ctrl+Alt+9`.
 - **Autostart** writes a freedesktop entry to `~/.config/autostart`.
-- **Config** lives at `~/.config/VirtualDesktopIndicator/config.json`.
+- **Config** lives at `~/.config/DeskCue/config.json`.
 - On Linux the app does **not** self-install updates; it notifies you and opens
   the release page.
 
@@ -75,9 +75,9 @@ build — and a system tray/AppIndicator (on GNOME, the "AppIndicator" extension
 (per-user, no root). Build from source:
 
 ```bash
-dotnet publish linux/VirtualDesktopIndicator.Linux.csproj \
+dotnet publish linux/DeskCue.Linux.csproj \
   -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o publish-linux
-./publish-linux/virtual-desktop-indicator
+./publish-linux/deskcue
 ```
 
 > ⚠️ The Linux build has been verified to compile and publish, but has **not yet
@@ -139,7 +139,7 @@ Open it by double-clicking the tray icon or via the **Settings...** menu.
 
 - **Automatic versioning** — every build increments `build.counter` by one, so the
   app version is auto-stamped as `1.1.0.<build>` (the `StampBuildVersion` target in
-  [csproj](VirtualDesktopIndicator.csproj)). To bump to a meaningful release version,
+  [csproj](DeskCue.csproj)). To bump to a meaningful release version,
   just edit `<VersionPrefix>` in the csproj. The installer version is read from the
   published exe automatically.
 - **Update check** — on startup the app queries the latest GitHub release in the
@@ -157,7 +157,7 @@ Open it by double-clicking the tray icon or via the **Settings...** menu.
 
 ## Config file
 
-`%APPDATA%\VirtualDesktopIndicator\config.json` (created with defaults on first run)
+`%APPDATA%\DeskCue\config.json` (created with defaults on first run)
 
 | Key | Description | Default |
 |-----|-------------|---------|

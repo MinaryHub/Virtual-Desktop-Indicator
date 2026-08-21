@@ -1,6 +1,6 @@
 using Avalonia;
 
-namespace VirtualDesktopIndicator.Linux;
+namespace DeskCue.Linux;
 
 internal static class Program
 {

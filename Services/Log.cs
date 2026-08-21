@@ -1,8 +1,8 @@
 using System.IO;
 
-namespace VirtualDesktopIndicator.Services;
+namespace DeskCue.Services;
 
-/// <summary>Minimal append-only debug log at %APPDATA%\VirtualDesktopIndicator\debug.log.</summary>
+/// <summary>Minimal append-only debug log at %APPDATA%\DeskCue\debug.log.</summary>
 public static class Log
 {
     private static readonly object Gate = new();

@@ -20,7 +20,7 @@ lets you jump to a desktop with global hotkeys. This is the **Linux/X11** build.
 ```
 
 This copies the binary to `~/.local/bin` and adds a menu entry. Launch it from
-your application menu, or run `virtual-desktop-indicator`.
+your application menu, or run `deskcue`.
 
 ## Uninstall
 
@@ -36,4 +36,4 @@ your application menu, or run `virtual-desktop-indicator`.
   "Run at login", change position, or check for updates.
 - Modifiers: `Super` (the Windows/⌘-style key), `Ctrl`, `Shift`, `Alt`.
 
-Config lives at `~/.config/VirtualDesktopIndicator/config.json`.
+Config lives at `~/.config/DeskCue/config.json`.

@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace VirtualDesktopIndicator.Services;
+namespace DeskCue.Services;
 
 /// <summary>
 /// "Support development" link — opens the project's GitHub Sponsors page in the user's

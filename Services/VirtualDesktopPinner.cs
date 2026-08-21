@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace VirtualDesktopIndicator.Services;
+namespace DeskCue.Services;
 
 /// <summary>
 /// Pins this app to ALL virtual desktops via the undocumented IVirtualDesktopPinnedApps
@@ -27,7 +27,7 @@ namespace VirtualDesktopIndicator.Services;
 public static class VirtualDesktopPinner
 {
     /// <summary>Explicit AppUserModelID we assign to the process and then pin.</summary>
-    public const string AppId = "VirtualDesktopIndicator.Overlay";
+    public const string AppId = "DeskCue.Overlay";
 
     private static readonly Guid CLSID_ImmersiveShell = new("C2F03A33-21F5-47FA-B4BB-156362A2F239");
     private static readonly Guid CLSID_VirtualDesktopPinnedApps = new("B5A399E7-1C87-46B8-88E9-FC5747B171BD");

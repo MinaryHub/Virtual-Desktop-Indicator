@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace VirtualDesktopIndicator.Linux.Services;
+namespace DeskCue.Linux.Services;
 
 public sealed record UpdateCheckResult(
     bool Available, Version? LatestVersion, string? HtmlUrl, string? Error)
